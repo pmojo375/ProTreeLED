@@ -66,6 +66,58 @@ void webSocketTask(void *parameter) {
   }
 }
 
+// LED task function
+void ledTask(void *parameter) {
+  while (true) {
+    if (mode == 5) {
+      Serial.println("Mode 1");
+      EVERY_N_SECONDS(SECONDS_PER_PALETTE) { 
+        chooseNextColorPalette( gTargetPalette ); 
+      }
+    
+      EVERY_N_MILLISECONDS(10) {
+        nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 12);
+      }
+
+      drawTwinkles(leds);
+    
+      FastLED.show();
+    } else if (timer - millis() > 1000/ (random16(fpsVariability) + fps) ) {
+
+      if (mode == 0) {
+        Serial.println("Mode 0");
+        glitter(color2, color3, color4);
+        fadeTowardColor(leds, NUM_LEDS, color1, fadeAmount);
+      }
+      else if (mode == 1) {
+        Serial.println("Mode 1");
+        colorWaves(inc_gHueState, brightness);
+      }
+      else if (mode == 2) {
+        Serial.println("Mode 2");
+        twinklingStars(color1);
+      }
+      else if (mode == 3) {
+        Serial.println("Mode 3");
+        candyCane(color1, color2);
+      }
+      else if (mode == 4) {
+        Serial.println("Mode 4");
+        risingSparklesEffect();
+      } else if (mode == 6) {
+        Serial.println("Mode 6");
+        
+        random16_add_entropy(random());
+        Fire2012WithPalette(); // run simulation frame, using palette colors
+      }
+
+      // send the 'leds' array out to the actual LED strip
+      FastLED.show();
+    }
+    vTaskDelay(pdMS_TO_TICKS(50)); // Yield to other tasks for 10ms
+  }
+}
+
 // Handle WebSocket events
 void onWebSocketEvent(AsyncWebSocket *server, AsyncWebSocketClient *client,
                       AwsEventType type, void *arg, uint8_t *data, size_t len) {
@@ -233,55 +285,18 @@ void setup() {
       NULL,       // Task handle
       0           // Core to pin the task to (0 or 1, or tskNO_AFFINITY for no pinning)
   );
+
+  xTaskCreatePinnedToCore(
+      ledTask,    // Task function
+      "LED Task", // Task name
+      4096,       // Stack size in bytes
+      NULL,       // Task input parameter
+      1,          // Task priority
+      NULL,       // Task handle
+      1           // Core to pin the task to (0 or 1, or tskNO_AFFINITY for no pinning)
+  );
 }
 
 void loop() {
-
-  if (mode == 5) {
-    Serial.println("Mode 1");
-		EVERY_N_SECONDS(SECONDS_PER_PALETTE) { 
-		  chooseNextColorPalette( gTargetPalette ); 
-		}
-	
-		EVERY_N_MILLISECONDS(10) {
-		  nblendPaletteTowardPalette( gCurrentPalette, gTargetPalette, 12);
-		}
-
-		drawTwinkles(leds);
-	
-		FastLED.show();
-	} else if (timer - millis() > 1000/ (random16(fpsVariability) + fps) ) {
-
-		if (mode == 0) {
-      Serial.println("Mode 0");
-			glitter(color2, color3, color4);
-			fadeTowardColor(leds, NUM_LEDS, color1, fadeAmount);
-		}
-		else if (mode == 1) {
-      Serial.println("Mode 1");
-			colorWaves(inc_gHueState, brightness);
-		}
-		else if (mode == 2) {
-      Serial.println("Mode 2");
-			twinklingStars(color1);
-		}
-		else if (mode == 3) {
-      Serial.println("Mode 3");
-			candyCane(color1, color2);
-		}
-		else if (mode == 4) {
-      Serial.println("Mode 4");
-			risingSparklesEffect();
-		} else if (mode == 6) {
-      Serial.println("Mode 6");
-			
-		  random16_add_entropy(random());
-		  Fire2012WithPalette(); // run simulation frame, using palette colors
-		}
-
-		// send the 'leds' array out to the actual LED strip
-		FastLED.show();
-	}
-
-	delay(20);
+  // Empty. All in tasks now
 }
