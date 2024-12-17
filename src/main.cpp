@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <ArduinoFFT.h>
-#include <ArduinoJson.h>
 #include <ArduinoOTA.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
@@ -58,21 +57,6 @@ const int highBandStart = 2001;
 const int highBandEnd = 8000;
 
 TaskHandle_t fftTaskHandle;
-
-// Function to broadcast log messages
-void broadcastLog(String message) {
-  // Get current time in date time format
-  time_t now;
-  struct tm timeinfo;
-  time(&now);
-  localtime_r(&now, &timeinfo);
-  char timeString[30];
-  strftime(timeString, sizeof(timeString), "%Y-%m-%d %H:%M:%S", &timeinfo);
-  // Send to log WebSocket clients
-  String logMessage = timeString + String(" - ") + message;
-  ws_logs.textAll(logMessage);
-  Serial.println(logMessage);  // Also print to Serial
-}
 
 void chartMic(long high) {
   // send all 3 bands to the web server to be charted'
@@ -182,9 +166,6 @@ uint8_t fadeAmount = 16;
 int mode = 0;
 bool setBrightness = false;
 uint8_t brightness = 255;
-
-CRGBPalette16 gCurrentPalette;
-CRGBPalette16 gTargetPalette;
 
 void setup() {
   // put your setup code here, to run once:

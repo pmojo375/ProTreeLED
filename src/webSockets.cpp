@@ -6,6 +6,21 @@ AsyncWebSocket ws_logs("/ws_logs");        // WebSocket for logs
 AsyncWebSocket ws_chart("/ws_chart");      // WebSocket for mic chart
 AsyncWebSocket ws_control("/ws_control");  // WebSocket for your other page
 
+// Function to broadcast log messages
+void broadcastLog(String message) {
+  // Get current time in date time format
+  time_t now;
+  struct tm timeinfo;
+  time(&now);
+  localtime_r(&now, &timeinfo);
+  char timeString[30];
+  strftime(timeString, sizeof(timeString), "%Y-%m-%d %H:%M:%S", &timeinfo);
+  // Send to log WebSocket clients
+  String logMessage = timeString + String(" - ") + message;
+  ws_logs.textAll(logMessage);
+  Serial.println(logMessage);  // Also print to Serial
+}
+
 void sendMessageToClients(const String &message) {
   ws_control.textAll(message);
 }
@@ -52,11 +67,11 @@ void onWebSocketControlEvent(AsyncWebSocket *server,
     Serial.println("WebSocket client disconnected");
   } else if (type == WS_EVT_DATA) {
     // Handle incoming data
-    JsonDocument doc;            // Adjust size according to your needs
-    deserializeJson(doc, data);  // Parse the JSON data
+    JsonDocument jsonDoc;            // Adjust size according to your needs
+    deserializeJson(jsonDoc, data);  // Parse the JSON data
 
-    String type = doc["type"];    // Get the type of message
-    String value = doc["value"];  // Get the value
+    String type = jsonDoc["type"];    // Get the type of message
+    String value = jsonDoc["value"];  // Get the value
 
     broadcastLog("Type: " + type);
     broadcastLog("Value: " + value);
