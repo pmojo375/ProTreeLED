@@ -4,12 +4,13 @@
 #include <FastLED.h>
 
 #define NUM_LEDS 450
-#define DATA_PIN 38
+#define DATA_PIN 5
 #define LED_TYPE WS2811
 #define COLOR_ORDER RGB
 #define SECONDS_PER_PALETTE  30
-#define COOLING  55
+#define COOLING  20
 #define SPARKING 120
+
 
 //extern CRGB leds[NUM_LEDS];
 extern CRGBArray<NUM_LEDS> leds;
@@ -30,8 +31,6 @@ CRGB computeOneTwinkle( uint32_t ms, uint8_t salt);
 
 uint8_t attackDecayWave8( uint8_t i);
 
-void normalMode(CRGB color1, CRGB color2, CRGB color3, CRGB color4, CRGB *leds, uint8_t fadeAmount);
-
 void coolLikeIncandescent( CRGB& c, uint8_t phase);
 
 void chooseNextColorPalette( CRGBPalette16& pal);
@@ -44,9 +43,9 @@ int getPalette();
 
 void colorWaves(bool increment_gHue, uint8_t brightness);
 
-void twinklingStars(CRGB color1);
+void twinklingStars(CRGB color1, uint8_t brightness);
 
-void candyCane(CRGB color1, CRGB color2);
+void candyCane(CRGB color1, CRGB color2, uint8_t brightness);
 
 void risingSparklesEffect();
 

@@ -73,6 +73,12 @@
 
   <br><br>
 
+  <label for="audioBrightness">Audio Brightness:</label>
+  <input type="checkbox" id="audioBrightness" checked>
+  <button onclick="sendAudioBrightnessState()">Apply</button>
+
+  <br><br>
+
   <label for="palette">Select Color Palette:</label>
   <select id="palette">
       <option value="0">RainbowColors</option>
@@ -83,6 +89,14 @@
       <option value="5">ForestColors</option>
       <option value="6">PartyColors</option>
       <option value="7">HeatColors</option>
+      <option value="8">Retro</option>
+      <option value="9">Blue White</option>
+      <option value="10">Fairy Lifhts</option>
+      <option value="11">Red Green White</option>
+      <option value="12">Red White</option>
+      <option value="13">Snow</option>
+      <option value="14">Holly</option>
+      <option value="15">Ice</option>
   </select>
   <button onclick="sendPalette()">Change Palette</button>
 
@@ -152,7 +166,7 @@
     var socket;
     
     function initWebSocket() {
-        socket = new WebSocket('ws://' + window.location.hostname + '/ws');
+        socket = new WebSocket('ws://' + window.location.hostname + '/ws_control');
         socket.onopen = function(event) {
             console.log('WebSocket connected');
         };
@@ -179,6 +193,14 @@
                     document.getElementById("incgHueState").checked = true;
                   } else {
                     document.getElementById("incgHueState").checked = false;
+                  }
+                  break;
+              case 'Brightness Audio':
+                  audioBrightness = message.value;
+                  if (audioBrightness == 1) {
+                    document.getElementById("audioBrightness").checked = true;
+                  } else {
+                    document.getElementById("audioBrightness").checked = false;
                   }
                   break;
               case 'Color 1':
@@ -256,6 +278,11 @@
     function sendIncgHueState() {
       var incgHueState = document.getElementById("incgHueState").checked;
       sendMessage("Increment gHue", incgHueState);
+    }
+
+    function sendAudioBrightnessState() {
+        var audioBrightness = document.getElementById("audioBrightness").checked;
+        sendMessage("Brightness Audio", audioBrightness);
     }
     
     function sendPalette() {

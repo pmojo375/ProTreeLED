@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Real-Time Voltage Plot</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <h1>Real-Time Voltage Plot</h1>
+    <canvas id="voltageChart" width="800" height="400"></canvas>
+
+    <script>
+        // Initialize Chart.js
+        const ctx = document.getElementById('voltageChart').getContext('2d');
+        const voltageChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Timestamps or indices
+                datasets: [{
+                    label: 'High',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 1,
+                    tension: 0.1,
+                },
+                {
+                    label: 'Mid',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 1,
+                    tension: 0.1,
+                },
+                {
+                    label: 'Low',
+                    data: [],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 1,
+                    tension: 0.1,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time',
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Voltage (V)',
+                        },
+                        suggestedMin: 0,
+                        suggestedMax: 1,
+                    }
+                }
+            }
+        });
+        let socket;
+
+        let refreshCounter = 0; // Counter to track when to refresh
+        const REFRESH_LIMIT = 1000; // Refresh every 1000 updates
+
+        function connectWebSocket() {
+            socket = new WebSocket(`ws://${window.location.hostname}/ws_logs`);
+
+            socket.onmessage = (event) => {
+                console.log('Received message:', event.data);
+
+
+                try {
+                    const data = JSON.parse(event.data);
+                    const high = parseFloat(data.high);
+                    const low = parseFloat(data.low);
+                    const mid = parseFloat(data.mid);
+                    const timestamp = new Date().toLocaleTimeString();
+                    console.log('Adding new data: ', { timestamp, high, mid, low });
+
+                    // Add new data
+                    voltageChart.data.labels.push(timestamp);
+                    voltageChart.data.datasets[0].data.push(high);
+                    voltageChart.data.datasets[1].data.push(mid);
+                    voltageChart.data.datasets[2].data.push(low);
+
+                    // Update the chart
+                    voltageChart.update();
+                    console.log('Chart updated successfully');
+
+                } catch (e) {
+                    console.error('Error processing WebSocket data:', e);
+                }
+            };
+
+            socket.onopen = () => {
+                console.log('WebSocket connected');
+            };
+
+            socket.onclose = () => {
+                console.log('WebSocket disconnected, attempting to reconnect...');
+                setTimeout(connectWebSocket, 1000); // Retry every second
+            };
+
+            socket.onerror = (err) => {
+                console.error('WebSocket error:', err);
+                socket.close(); // Close the connection to trigger reconnect
+            };
+        }
+
+        connectWebSocket();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Real-Time Logs</title>
+  <script>
+    let socket;
+
+
+    window.onload = function () {
+      socket = new WebSocket(`ws://${window.location.hostname}/ws_logs`);
+
+      socket.onopen = function () {
+        console.log("Log WebSocket connected");
+        document.getElementById("logs").insertAdjacentHTML('afterbegin', "<p>Log WebSocket connection established.</p>");
+      };
+
+      socket.onmessage = function (event) {
+        document.getElementById("logs").insertAdjacentHTML('afterbegin', `<p>${event.data}</p>`);
+      };
+
+      socket.onclose = function () {
+        console.log("Log WebSocket disconnected");
+        document.getElementById("logs").insertAdjacentHTML('afterbegin', "<p>Log WebSocket connection closed.</p>");
+      };
+    };
+  </script>
+</head>
+<body>
+  <h1>Real-Time Logs</h1>
+  <div id="logs"></div>
+</body>
+</html>

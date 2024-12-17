@@ -14,13 +14,7 @@ int secondsPerPalette = 30;
 int autoSelectBackgroundColor = 0;
 int coolLikeIncandescentEn = 1;
 
-void normalMode(CRGB color1, CRGB color2, CRGB color3, CRGB color4, CRGB *leds, uint8_t fadeAmount) {
-  glitter(color2, color3, color4);
-	fadeTowardColor(leds, NUM_LEDS, color1, fadeAmount);
-}
-
-void Fire2012WithPalette()
-{
+void Fire2012WithPalette() {
 // Array of temperature readings at each simulation cell
   static uint8_t heat[NUM_LEDS];
 
@@ -30,7 +24,7 @@ void Fire2012WithPalette()
     }
   
     // Step 2.  Heat from each cell drifts 'up' and diffuses a little
-    for( int k= NUM_LEDS - 1; k >= 2; k--) {
+    for(int k = NUM_LEDS - 1; k >= 2; k--) {
       heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
     }
     
@@ -44,7 +38,7 @@ void Fire2012WithPalette()
     for( int j = 0; j < NUM_LEDS; j++) {
       // Scale the heat value from 0-255 down to 0-240
       // for best results with color palettes.
-      uint8_t colorindex = scale8( heat[j], 240);
+      uint8_t colorindex = scale8(heat[j], 240);
       CRGB color = ColorFromPalette( gPal, colorindex);
       int pixelnumber;
       if( gReverseDirection ) {
@@ -293,6 +287,30 @@ void setPalette(int i) {
     case 7:
       currentPalette = HeatColors_p;
       break;
+    case 8:
+      currentPalette = RetroC9_p;
+      break;
+    case 9:
+      currentPalette = BlueWhite_p;
+      break;
+    case 10:
+      currentPalette = FairyLight_p;
+      break;
+    case 11:
+      currentPalette = RedGreenWhite_p;
+      break;
+    case 12:
+      currentPalette = RedWhite_p;
+      break;
+    case 13:
+      currentPalette = Snow_p;
+      break;
+    case 14:
+      currentPalette = Holly_p;
+      break;
+    case 15:
+      currentPalette = Ice_p;
+      break;
   }
 }
 
@@ -321,6 +339,22 @@ int getPalette() {
     return 6;
   } else if (currentPalette == HeatColors_p) {
     return 7;
+  } else if (currentPalette == RetroC9_p) {
+    return 8;
+  } else if (currentPalette == BlueWhite_p) {
+    return 9;
+  } else if (currentPalette == FairyLight_p) {
+    return 10;
+  } else if (currentPalette == RedGreenWhite_p) {
+    return 11;
+  } else if (currentPalette == RedWhite_p) {
+    return 12;
+  } else if (currentPalette == Snow_p) {
+    return 13;
+  } else if (currentPalette == Holly_p) {
+    return 14;
+  } else if (currentPalette == Ice_p) {
+    return 15;
   } else {
     return 0;
   }
@@ -334,23 +368,37 @@ void colorWaves(bool increment_gHue, uint8_t brightness) {
   fill_palette(leds, NUM_LEDS, gHue, 7, currentPalette, brightness, LINEARBLEND);
 }
 
-void twinklingStars(CRGB color1) {
+void twinklingStars(CRGB color1, uint8_t brightness) {
   fadeToBlackBy(leds, NUM_LEDS, 20);
   int pos = random(NUM_LEDS);
+
+  // Scale the color1 brightness
+  color1.nscale8_video(brightness);
   leds[pos] += color1; // cool white color
 }
 
-void candyCane(CRGB color1, CRGB color2) {
+void candyCane(CRGB color1, CRGB color2, uint8_t brightness) {
   static uint8_t stripePattern = 0;
+  static uint8_t updateCounter = 0;
+
+  // Scale the brightness of the colors
+  color1.nscale8_video(brightness);
+  color2.nscale8_video(brightness);
+
   for (int i = 0; i < NUM_LEDS; i++) {
     leds[i] = (i + stripePattern) % 4 < 2 ? color1 : color2;
   }
-  stripePattern++;
+
+  // Increment the stripe pattern every 4th call
+  if (++updateCounter >= 4) {
+    stripePattern++;
+    updateCounter = 0;
+  }
 }
 
 void risingSparklesEffect() {
-    const uint8_t sparkleChance = 5; // Chance of new sparkle
-    const uint8_t sparkleFade = 80;  // Sparkle fade out speed
+    const uint8_t sparkleChance = 25; // Chance of new sparkle
+    const uint8_t sparkleFade = 1;  // Sparkle fade out speed
 
     // Shift everything up one pixel per frame
     for (int i = 0; i < NUM_LEDS - 1; i++) {
@@ -364,8 +412,10 @@ void risingSparklesEffect() {
         leds[NUM_LEDS - 1] = CRGB::Black;
     }
 
-    // Fade the LEDs
-    fadeToBlackBy(leds, NUM_LEDS, sparkleFade);
+    // Fade the LEDs every 5 frames
+    if (millis() % 5 == 0) {
+     fadeToBlackBy(leds, NUM_LEDS, sparkleFade);
+    }
 }
 
 void setAll(CRGB color) {
@@ -402,20 +452,16 @@ void meteorRain(CRGB color, byte meteorSize, byte meteorTrailDecay, bool meteorR
     }
 }
 
-void glitter(CRGB color1, CRGB color2, CRGB color3)
-{
+// Set three random LEDs to the specified colors
+void glitter(CRGB color1, CRGB color2, CRGB color3){
+  // set random LED to white
+  leds[random16(NUM_LEDS)] = color1;
 
-  if (random8() < 255)
-  {
-    // set random LED to white
-    leds[random16(NUM_LEDS)] = color1;
+  // set random LED to red
+  leds[random16(NUM_LEDS)] = color2;
 
-    // set random LED to red
-    leds[random16(NUM_LEDS)] = color2;
-
-    // set random LED to red
-    leds[random16(NUM_LEDS)] = color3;
-  }
+  // set random LED to red
+  leds[random16(NUM_LEDS)] = color3;
 }
 
 // Helper function that blends one uint8_t toward another by a given amount
