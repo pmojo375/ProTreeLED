@@ -14,6 +14,25 @@ int secondsPerPalette = 30;
 int autoSelectBackgroundColor = 0;
 int coolLikeIncandescentEn = 1;
 
+// Default Colors
+CRGB color1 = CRGB::DarkGreen;
+CRGB color2 = CRGB::Red;
+CRGB color3 = CRGB::Blue;
+CRGB color4 = CRGB::WhiteSmoke;
+
+// Default Parameters
+int fpsVariability = 50;
+int fps = 10;
+bool inc_gHueState = false;
+uint8_t fadeAmount = 16;
+int mode = 0;
+bool setBrightness = false;
+uint8_t brightness = 255;
+CRGBPalette16 gCurrentPalette = RainbowColors_p;
+CRGBPalette16 gTargetPalette = RainbowColors_p;
+int startRange = 0;
+int endRange = NUM_LEDS;
+
 void Fire2012WithPalette() {
 // Array of temperature readings at each simulation cell
   static uint8_t heat[NUM_LEDS];

@@ -22,6 +22,24 @@ extern int twinkleDensity;
 extern int secondsPerPalette;
 extern int autoSelectBackgroundColor;
 extern int coolLikeIncandescentEn;
+extern int startRange;
+extern int endRange;
+
+// Default Colors
+extern CRGB color1;
+extern CRGB color2;
+extern CRGB color3;
+extern CRGB color4;
+
+// Default Parameters
+extern int fpsVariability;
+extern int fps;
+extern bool inc_gHueState;
+extern uint8_t fadeAmount;
+extern int mode;
+extern bool setBrightness;
+extern uint8_t brightness;
+extern bool setBrightness;
 
 void Fire2012WithPalette();
 

@@ -6,6 +6,12 @@ AsyncWebSocket ws_logs("/ws_logs");        // WebSocket for logs
 AsyncWebSocket ws_chart("/ws_chart");      // WebSocket for mic chart
 AsyncWebSocket ws_control("/ws_control");  // WebSocket for your other page
 
+// Initialize an empty JSON document
+JsonDocument doc2;
+
+// Create an empty JsonArray
+JsonArray group = doc2.add<JsonArray>();
+
 // Function to broadcast log messages
 void broadcastLog(String message) {
   // Get current time in date time format
@@ -63,6 +69,10 @@ void onWebSocketControlEvent(AsyncWebSocket *server,
                          String(autoSelectBackgroundColor) + "\"}");
     sendMessageToClients("{\"type\":\"Brightness Audio\",\"value\":\"" +
                          String(setBrightness) + "\"}");
+    sendMessageToClients("{\"type\":\"Start Range\",\"value\":\"" +
+                         String(startRange) + "\"}");
+    sendMessageToClients("{\"type\":\"End Range\",\"value\":\"" +
+                         String(endRange) + "\"}");
   } else if (type == WS_EVT_DISCONNECT) {
     Serial.println("WebSocket client disconnected");
   } else if (type == WS_EVT_DATA) {
@@ -85,6 +95,13 @@ void onWebSocketControlEvent(AsyncWebSocket *server,
       } else {
         inc_gHueState = false;
       }
+    } else if (type == "Group") {
+      group = jsonDoc["value"].as<JsonArray>();
+
+    } else if (type == "Start Range") {
+      startRange = value.toInt();
+    } else if (type == "End Range") {
+      endRange = value.toInt();
     } else if (type == "Brightness Audio") {
       if (value == "true") {
         setBrightness = true;
@@ -133,7 +150,7 @@ void onWebSocketControlEvent(AsyncWebSocket *server,
   }
 }
 
-void configWS() {
+void setupWebSockets() {
   // Initialize the filesystem
   if (!LittleFS.begin()) {
     Serial.println("An error occurred while mounting LittleFS");

@@ -62,8 +62,16 @@
       <option value="4">Rising Sparkles</option>
       <option value="5">Twinkle Fox</option>
       <option value="6">Fire</option>
+      <option value="7">Set Range</option>
+      <option value="8">Group Test</option>
   </select>
   <button onclick="sendMode()">Apply Mode</button>
+
+  <br><br>
+
+  <label for="groupInput">Enter LED Group:</label>
+  <input type="text" id="groupInput" placeholder="e.g., 0-50, 55, 60-65">
+  <button onclick="sendGroup()">Send Group</button>
 
   <br><br>
 
@@ -72,6 +80,12 @@
   <button onclick="sendIncgHueState()">Apply</button>
 
   <br><br>
+
+  <label for="startRange">Start Range:</label>
+  <input type="number" id="startRange" name="startRange">
+  <label for="endRange">End Range:</label>
+  <input type="number" id="endRange" name="endRange">
+  <button onclick="sendRange()">Apply Range</button>
 
   <label for="audioBrightness">Audio Brightness:</label>
   <input type="checkbox" id="audioBrightness" checked>
@@ -183,6 +197,14 @@
                   mode = message.value;
                   document.getElementById("mode").value = mode;
                   break;
+              case 'Start Range':
+                  startRange = message.value;
+                  document.getElementById("startRange").value = startRange;
+                  break;
+              case 'End Range':
+                  endRange = message.value;
+                  document.getElementById("endRange").value = endRange;
+                  break;
               case 'Palette':
                   palette = message.value;
                   document.getElementById("palette").value = palette;
@@ -263,6 +285,38 @@
         };
     }
 
+
+    // Function to unpack the group string into an array of LED indices
+    function unpackGroup(input) {
+        const ranges = input.split(","); // Split by commas
+        let unpacked = [];
+
+        ranges.forEach(range => {
+            range = range.trim(); // Remove whitespace
+            if (range.includes("-")) {
+                // Handle range (e.g., "0-50")
+                const [start, end] = range.split("-").map(Number);
+                for (let i = start; i <= end; i++) {
+                    unpacked.push(i);
+                }
+            } else {
+                // Handle single LED (e.g., "55")
+                unpacked.push(Number(range));
+            }
+        });
+
+        return unpacked;
+    }
+
+    // Function to send the group to the ESP32
+    function sendGroup() {
+        const input = document.getElementById("groupInput").value;
+        const unpackedGroup = unpackGroup(input);
+
+        sendMessage("Group", unpackedGroup);
+        console.log("Sent group:", unpackedGroup);
+    }
+
     function sendMessage(type, value) {
         var message = JSON.stringify({type: type, value: value});
         socket.send(message);
@@ -273,6 +327,16 @@
     function sendMode() {
       var mode = document.getElementById("mode").value;
       sendMessage("Mode", mode);
+    }
+
+    function sendRange() {
+      var startRange = document.getElementById("startRange").value;
+      var endRange = document.getElementById("endRange").value;
+      sendMessage("Start Range", startRange);
+      // delay to ensure startRange is sent first
+        setTimeout(function() {
+            sendMessage("End Range", endRange);
+        }, 100);
     }
     
     function sendIncgHueState() {
