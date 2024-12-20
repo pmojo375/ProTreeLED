@@ -1,13 +1,13 @@
 #include <Arduino.h>
+#include <ArduinoFFT.h>
 #include <ArduinoOTA.h>
 #include <FastLED.h>
 #include <OTEUpdater.h>
-#include <ArduinoFFT.h>
 #include <WiFi.h>
 #include <ledFunctions.h>
+#include <mic.h>
 #include <time.h>
 #include <webSockets.h>
-#include <mic.h>
 // include rtos
 #include <freertos/FreeRTOS.h>
 
@@ -41,7 +41,6 @@ unsigned long timer;
 #define FFT_SCALE 1024
 double micBuffer[SAMPLES];
 
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -71,7 +70,6 @@ void setup() {
 }
 
 void loop() {
-
   // Get the amplitude of the audio signal
   getAmplitude();
 
@@ -122,13 +120,16 @@ void loop() {
     } else if (mode == 8) {
       // set all lights to off
       fill_solid(leds, NUM_LEDS, CRGB::Black);
-      broadcastLog("All lights off");
-      for (int led : group) {
-        broadcastLog("Setting Lights");
-        leds[led] = CRGB::White;
+
+      for (int i = 0; i < group1.size(); i++) {
+        if (group1[i] >= 0 && group1[i] < NUM_LEDS) {
+          leds[group1[i]] = CRGB::White;
+        } else {
+          broadcastLog("Invalid LED number");
+        }
       }
     }
-    
+
     // send the 'leds' array out to the actual LED strip
     FastLED.show();
   }

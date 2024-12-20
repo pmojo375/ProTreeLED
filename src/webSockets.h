@@ -9,17 +9,18 @@
 #include <LittleFS.h>
 #include <time.h>
 #include <Arduino.h>
+#include <vector>
 
 extern AsyncWebServer server;
 extern AsyncWebSocket ws_logs;        // WebSocket for logs
 extern AsyncWebSocket ws_chart;      // WebSocket for mic chart
 extern AsyncWebSocket ws_control;  // WebSocket for your other page
 
-// Initialize an empty JSON document
-extern JsonDocument doc2;
-
 // Create an empty JsonArray
 extern JsonArray group;
+extern JsonDocument jsonDoc;
+
+extern std::vector<int> group1;
 
 // Function to broadcast log messages;
 void broadcastLog(String message);

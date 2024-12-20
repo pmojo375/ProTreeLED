@@ -6,11 +6,10 @@ AsyncWebSocket ws_logs("/ws_logs");        // WebSocket for logs
 AsyncWebSocket ws_chart("/ws_chart");      // WebSocket for mic chart
 AsyncWebSocket ws_control("/ws_control");  // WebSocket for your other page
 
-// Initialize an empty JSON document
-JsonDocument doc2;
-
-// Create an empty JsonArray
-JsonArray group = doc2.add<JsonArray>();
+// Handle incoming data
+JsonDocument jsonDoc;
+std::vector<int> group1 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+JsonArray group;
 
 // Function to broadcast log messages
 void broadcastLog(String message) {
@@ -76,8 +75,6 @@ void onWebSocketControlEvent(AsyncWebSocket *server,
   } else if (type == WS_EVT_DISCONNECT) {
     Serial.println("WebSocket client disconnected");
   } else if (type == WS_EVT_DATA) {
-    // Handle incoming data
-    JsonDocument jsonDoc;            // Adjust size according to your needs
     deserializeJson(jsonDoc, data);  // Parse the JSON data
 
     String type = jsonDoc["type"];    // Get the type of message
@@ -97,6 +94,13 @@ void onWebSocketControlEvent(AsyncWebSocket *server,
       }
     } else if (type == "Group") {
       group = jsonDoc["value"].as<JsonArray>();
+      // log the group
+      group1.clear();
+      for (JsonVariant led : group) {
+        if (led.is<int>()) {
+          group1.push_back(led.as<int>());
+        }
+      }
 
     } else if (type == "Start Range") {
       startRange = value.toInt();
