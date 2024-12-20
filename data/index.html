@@ -69,9 +69,33 @@
 
   <br><br>
 
-  <label for="groupInput">Enter LED Group:</label>
-  <input type="text" id="groupInput" placeholder="e.g., 0-50, 55, 60-65">
-  <button onclick="sendGroup()">Send Group</button>
+  <label for="group1Input">Enter LED Group:</label>
+  <input type="text" id="group1Input" placeholder="e.g., 0-50, 55, 60-65">
+  <button onclick="sendGroup(1)">Send Group</button>
+
+  <br><br>
+
+  <label for="group2Input">Enter LED Group:</label>
+  <input type="text" id="group2Input" placeholder="e.g., 0-50, 55, 60-65">
+  <button onclick="sendGroup(2)">Send Group</button>
+
+  <br><br>
+
+  <label for="group3Input">Enter LED Group:</label>
+  <input type="text" id="group3Input" placeholder="e.g., 0-50, 55, 60-65">
+  <button onclick="sendGroup(3)">Send Group</button>
+
+  <br><br>
+
+  <label for="group4Input">Enter LED Group:</label>
+  <input type="text" id="group4Input" placeholder="e.g., 0-50, 55, 60-65">
+  <button onclick="sendGroup(4)">Send Group</button>
+
+  <br><br>
+
+  <label for="group5Input">Enter LED Group:</label>
+  <input type="text" id="group5Input" placeholder="e.g., 0-50, 55, 60-65">
+  <button onclick="sendGroup(5)">Send Group</button>
 
   <br><br>
 
@@ -309,11 +333,15 @@
     }
 
     // Function to send the group to the ESP32
-    function sendGroup() {
-        const input = document.getElementById("groupInput").value;
+    function sendGroup(number) {
+        // get element id by number group0Input, group1Input, etc.
+        const input = document.getElementById("group" + number + "Input").value;
         const unpackedGroup = unpackGroup(input);
 
-        sendMessage("Group", unpackedGroup);
+        // concatonate the group with the number like so: "Group0"
+        const groupString = "Group" + number;
+
+        sendMessage(groupString, unpackedGroup);
         console.log("Sent group:", unpackedGroup);
     }
 

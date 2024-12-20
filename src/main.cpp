@@ -128,6 +128,38 @@ void loop() {
           broadcastLog("Invalid LED number");
         }
       }
+      
+      for (int i = 0; i < group2.size(); i++) {
+        if (group2[i] >= 0 && group2[i] < NUM_LEDS) {
+          leds[group2[i]] = CRGB::Red;
+        } else {
+          broadcastLog("Invalid LED number");
+        }
+      }
+
+      for (int i = 0; i < group3.size(); i++) {
+        if (group3[i] >= 0 && group3[i] < NUM_LEDS) {
+          leds[group3[i]] = CRGB::Blue;
+        } else {
+          broadcastLog("Invalid LED number");
+        }
+      }
+
+      for (int i = 0; i < group4.size(); i++) {
+        if (group4[i] >= 0 && group4[i] < NUM_LEDS) {
+          leds[group4[i]] = CRGB::Green;
+        } else {
+          broadcastLog("Invalid LED number");
+        }
+      }
+
+      for (int i = 0; i < group5.size(); i++) {
+        if (group5[i] >= 0 && group5[i] < NUM_LEDS) {
+          leds[group5[i]] = CRGB::Yellow;
+        } else {
+          broadcastLog("Invalid LED number");
+        }
+      }
     }
 
     // send the 'leds' array out to the actual LED strip

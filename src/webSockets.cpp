@@ -9,6 +9,10 @@ AsyncWebSocket ws_control("/ws_control");  // WebSocket for your other page
 // Handle incoming data
 JsonDocument jsonDoc;
 std::vector<int> group1 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+std::vector<int> group2 = {10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+std::vector<int> group3 = {20, 21, 22, 23, 24, 25, 26, 27, 28, 29};
+std::vector<int> group4 = {30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+std::vector<int> group5 = {40, 41, 42, 43, 44, 45, 46, 47, 48, 49};
 JsonArray group;
 
 // Function to broadcast log messages
@@ -92,13 +96,49 @@ void onWebSocketControlEvent(AsyncWebSocket *server,
       } else {
         inc_gHueState = false;
       }
-    } else if (type == "Group") {
+    } else if (type == "Group1") {
       group = jsonDoc["value"].as<JsonArray>();
       // log the group
       group1.clear();
       for (JsonVariant led : group) {
         if (led.is<int>()) {
           group1.push_back(led.as<int>());
+        }
+      }
+    } else if (type == "Group2") {
+      group = jsonDoc["value"].as<JsonArray>();
+      // log the group
+      group2.clear();
+      for (JsonVariant led : group) {
+        if (led.is<int>()) {
+          group2.push_back(led.as<int>());
+        }
+      }
+    } else if (type == "Group3") {
+      group = jsonDoc["value"].as<JsonArray>();
+      // log the group
+      group3.clear();
+      for (JsonVariant led : group) {
+        if (led.is<int>()) {
+          group3.push_back(led.as<int>());
+        }
+      }
+    } else if (type == "Group4") {
+      group = jsonDoc["value"].as<JsonArray>();
+      // log the group
+      group4.clear();
+      for (JsonVariant led : group) {
+        if (led.is<int>()) {
+          group4.push_back(led.as<int>());
+        }
+      }
+    } else if (type == "Group5") {
+      group = jsonDoc["value"].as<JsonArray>();
+      // log the group
+      group5.clear();
+      for (JsonVariant led : group) {
+        if (led.is<int>()) {
+          group5.push_back(led.as<int>());
         }
       }
 

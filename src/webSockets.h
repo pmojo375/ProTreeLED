@@ -21,6 +21,10 @@ extern JsonArray group;
 extern JsonDocument jsonDoc;
 
 extern std::vector<int> group1;
+extern std::vector<int> group2;
+extern std::vector<int> group3;
+extern std::vector<int> group4;
+extern std::vector<int> group5;
 
 // Function to broadcast log messages;
 void broadcastLog(String message);
