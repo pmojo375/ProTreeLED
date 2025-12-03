@@ -1,216 +1,730 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LED Christmas Tree Control</title>
   <style>
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      :root {
+          --bg-primary: #0f0f0f;
+          --bg-secondary: #1a1a1a;
+          --bg-tertiary: #252525;
+          --bg-card: #1e1e1e;
+          --text-primary: #e0e0e0;
+          --text-secondary: #b0b0b0;
+          --accent: #4CAF50;
+          --accent-hover: #45a049;
+          --accent-light: #66bb6a;
+          --border: #333;
+          --border-light: #444;
+          --shadow: rgba(0, 0, 0, 0.3);
+          --shadow-lg: rgba(0, 0, 0, 0.5);
+      }
+
       body {
-          font-family: Arial, sans-serif;
-          background-color: #f4f4f4;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+          background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+          color: var(--text-primary);
           padding: 20px;
-          color: #333;
+          min-height: 100vh;
+          line-height: 1.6;
+      }
+
+      .container {
+          max-width: 1400px;
+          margin: 0 auto;
+      }
+
+      header {
+          text-align: center;
+          margin-bottom: 40px;
+          padding: 30px 0;
       }
 
       h1 {
-          color: #4CAF50;
+          font-size: 2.5rem;
+          font-weight: 700;
+          background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 10px;
+          letter-spacing: -0.5px;
+      }
+
+      .status-indicator {
+          display: inline-block;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background-color: #666;
+          margin-right: 8px;
+          animation: pulse 2s infinite;
+      }
+
+      .status-indicator.connected {
+          background-color: var(--accent);
+      }
+
+      @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+      }
+
+      .card {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 24px;
+          margin-bottom: 24px;
+          box-shadow: 0 4px 6px var(--shadow);
+          transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 16px var(--shadow-lg);
+      }
+
+      .card h2 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: var(--accent);
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+      }
+
+      .card h2::before {
+          content: '';
+          width: 4px;
+          height: 24px;
+          background: var(--accent);
+          border-radius: 2px;
       }
 
       label {
           display: block;
-          margin: 15px 0 5px;
+          margin-bottom: 8px;
+          font-weight: 500;
+          color: var(--text-primary);
+          font-size: 0.95rem;
       }
 
-      input[type=color], input[type=range] {
+      input[type="text"],
+      input[type="number"],
+      select {
           width: 100%;
-          height: 50px;
-          padding: 8px;
-          border: 1px solid #ddd;
+          padding: 12px 16px;
+          background: var(--bg-tertiary);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          color: var(--text-primary);
+          font-size: 1rem;
+          transition: all 0.2s;
+          font-family: inherit;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      select:focus {
+          outline: none;
+          border-color: var(--accent);
+          box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+      }
+
+      input[type="text"]::placeholder {
+          color: var(--text-secondary);
+      }
+
+      input[type="range"] {
+          width: 100%;
+          height: 8px;
+          background: var(--bg-tertiary);
           border-radius: 4px;
-          box-sizing: border-box;
+          outline: none;
+          -webkit-appearance: none;
+          appearance: none;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          background: var(--accent);
+          border-radius: 50%;
+          cursor: pointer;
+          transition: all 0.2s;
+      }
+
+      input[type="range"]::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+          box-shadow: 0 0 0 8px rgba(76, 175, 80, 0.2);
+      }
+
+      input[type="range"]::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          background: var(--accent);
+          border-radius: 50%;
+          cursor: pointer;
+          border: none;
+          transition: all 0.2s;
+      }
+
+      input[type="range"]::-moz-range-thumb:hover {
+          transform: scale(1.2);
+      }
+
+      input[type="checkbox"] {
+          width: 20px;
+          height: 20px;
+          accent-color: var(--accent);
+          cursor: pointer;
       }
 
       button {
-          background-color: #4CAF50;
+          background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
           color: white;
-          padding: 10px 20px;
+          padding: 12px 24px;
           border: none;
-          border-radius: 4px;
+          border-radius: 8px;
           cursor: pointer;
-          font-size: 16px;
+          font-size: 1rem;
+          font-weight: 600;
+          transition: all 0.2s;
+          box-shadow: 0 2px 4px var(--shadow);
       }
 
       button:hover {
-          background-color: #45a049;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px var(--shadow-lg);
       }
 
-      .control-group {
+      button:active {
+          transform: translateY(0);
+      }
+
+      .form-group {
           margin-bottom: 20px;
+      }
+
+      .form-row {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 12px;
+          align-items: end;
+      }
+
+      .form-row-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+      }
+
+      .checkbox-group {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+      }
+
+      .checkbox-group label {
+          margin: 0;
+          cursor: pointer;
+      }
+
+      .color-picker-section {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: 12px;
+          padding: 24px;
+          margin-bottom: 24px;
+          box-shadow: 0 4px 6px var(--shadow);
+      }
+
+      .color-picker-section h2 {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: var(--accent);
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+      }
+
+      .color-picker-section h2::before {
+          content: '';
+          width: 4px;
+          height: 24px;
+          background: var(--accent);
+          border-radius: 2px;
+      }
+
+      .color-picker-group {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 24px;
+          margin-top: 20px;
+      }
+
+      .color-picker-item {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+      }
+
+      .color-picker-item label {
+          font-weight: 600;
+          color: var(--text-primary);
+          margin: 0;
+          font-size: 1rem;
+      }
+
+      .color-picker-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+      }
+
+      input[type=color] {
+          width: 80px;
+          height: 60px;
+          padding: 4px;
+          border: 2px solid var(--border);
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.2s;
+          background: var(--bg-tertiary);
+      }
+
+      input[type=color]:hover {
+          transform: scale(1.05);
+          border-color: var(--accent);
+          box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+      }
+
+      .color-preview {
+          flex: 1;
+          height: 60px;
+          border-radius: 10px;
+          border: 2px solid var(--border);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Courier New', monospace;
+          font-weight: bold;
+          font-size: 0.95rem;
+          color: var(--text-primary);
+          background: var(--bg-tertiary);
+          transition: all 0.2s;
+      }
+
+      .color-preview.dark-text {
+          color: #fff;
+          text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+      }
+
+      .preset-colors {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 8px;
+      }
+
+      .preset-color-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          border: 2px solid var(--border);
+          cursor: pointer;
+          transition: all 0.2s;
+      }
+
+      .preset-color-btn:hover {
+          transform: scale(1.15);
+          border-color: var(--accent);
+          box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+      }
+
+      .range-group {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+      }
+
+      .range-group label {
+          min-width: 140px;
+          margin: 0;
+      }
+
+      .range-value {
+          min-width: 50px;
+          text-align: right;
+          color: var(--accent);
+          font-weight: 600;
+          font-family: 'Courier New', monospace;
+      }
+
+      .grid-2 {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 24px;
+      }
+
+      .led-groups {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 16px;
+      }
+
+      .led-group-item {
+          background: var(--bg-tertiary);
+          padding: 16px;
+          border-radius: 8px;
+          border: 1px solid var(--border);
+      }
+
+      @media (max-width: 768px) {
+          body {
+              padding: 12px;
+          }
+
+          h1 {
+              font-size: 2rem;
+          }
+
+          .card {
+              padding: 16px;
+          }
+
+          .form-row {
+              grid-template-columns: 1fr;
+          }
+
+          .form-row-2 {
+              grid-template-columns: 1fr;
+          }
+
+          .color-picker-group {
+              grid-template-columns: 1fr;
+          }
       }
   </style>
 </head>
 
 <body>
+  <div class="container">
+    <header>
+      <h1>LED Christmas Tree Control</h1>
+      <p style="color: var(--text-secondary);">
+        <span class="status-indicator" id="statusIndicator"></span>
+        <span id="statusText">Connecting...</span>
+      </p>
+    </header>
 
-  <h1>LED Christmas Tree Control</h1>
+    <div class="card">
+      <h2>Mode Selection</h2>
+      <div class="form-group">
+        <label for="mode">Function Mode</label>
+        <div class="form-row">
+          <select id="mode">
+            <option value="0">Normal</option>
+            <option value="1">Color Waves</option>
+            <option value="2">Twinkling Stars</option>
+            <option value="3">Candy Cane</option>
+            <option value="4">Rising Sparkles</option>
+            <option value="5">Twinkle Fox</option>
+            <option value="6">Fire</option>
+            <option value="7">Set Range</option>
+            <option value="8">Group Test</option>
+          </select>
+          <button onclick="sendMode()">Apply</button>
+        </div>
+      </div>
+    </div>
 
-  <label for="mode">Select Function:</label>
-  <select id="mode">
-      <option value="0">Normal</option>
-      <option value="1">Color Waves</option>
-      <option value="2">Twinkling Stars</option>
-      <option value="3">Candy Cane</option>
-      <option value="4">Rising Sparkles</option>
-      <option value="5">Twinkle Fox</option>
-      <option value="6">Fire</option>
-      <option value="7">Set Range</option>
-      <option value="8">Group Test</option>
-  </select>
-  <button onclick="sendMode()">Apply Mode</button>
+    <div class="card">
+      <h2>LED Groups</h2>
+      <div class="led-groups">
+        <div class="led-group-item">
+          <label for="group1Input">Group 1</label>
+          <div class="form-row">
+            <input type="text" id="group1Input" placeholder="e.g., 0-50, 55, 60-65">
+            <button onclick="sendGroup(1)">Send</button>
+          </div>
+        </div>
+        <div class="led-group-item">
+          <label for="group2Input">Group 2</label>
+          <div class="form-row">
+            <input type="text" id="group2Input" placeholder="e.g., 0-50, 55, 60-65">
+            <button onclick="sendGroup(2)">Send</button>
+          </div>
+        </div>
+        <div class="led-group-item">
+          <label for="group3Input">Group 3</label>
+          <div class="form-row">
+            <input type="text" id="group3Input" placeholder="e.g., 0-50, 55, 60-65">
+            <button onclick="sendGroup(3)">Send</button>
+          </div>
+        </div>
+        <div class="led-group-item">
+          <label for="group4Input">Group 4</label>
+          <div class="form-row">
+            <input type="text" id="group4Input" placeholder="e.g., 0-50, 55, 60-65">
+            <button onclick="sendGroup(4)">Send</button>
+          </div>
+        </div>
+        <div class="led-group-item">
+          <label for="group5Input">Group 5</label>
+          <div class="form-row">
+            <input type="text" id="group5Input" placeholder="e.g., 0-50, 55, 60-65">
+            <button onclick="sendGroup(5)">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <br><br>
+    <div class="card">
+      <h2>Color Palette</h2>
+      <div class="form-group">
+        <label for="palette">Palette Selection</label>
+        <div class="form-row">
+          <select id="palette">
+            <option value="0">RainbowColors</option>
+            <option value="1">RainbowStripeColors</option>
+            <option value="2">CloudColors</option>
+            <option value="3">LavaColors</option>
+            <option value="4">OceanColors</option>
+            <option value="5">ForestColors</option>
+            <option value="6">PartyColors</option>
+            <option value="7">HeatColors</option>
+            <option value="8">Retro</option>
+            <option value="9">Blue White</option>
+            <option value="10">Fairy Lifhts</option>
+            <option value="11">Red Green White</option>
+            <option value="12">Red White</option>
+            <option value="13">Snow</option>
+            <option value="14">Holly</option>
+            <option value="15">Ice</option>
+          </select>
+          <button onclick="sendPalette()">Apply</button>
+        </div>
+      </div>
+    </div>
 
-  <label for="group1Input">Enter LED Group:</label>
-  <input type="text" id="group1Input" placeholder="e.g., 0-50, 55, 60-65">
-  <button onclick="sendGroup(1)">Send Group</button>
+    <div class="color-picker-section">
+      <h2>Color Selection</h2>
+      <div class="color-picker-group">
+        <div class="color-picker-item">
+          <label for="Color1">Color 1</label>
+          <div class="color-picker-wrapper">
+            <input type="color" id="Color1" name="Color1" value="#ff0000" onchange="updateColorPreview(1, this.value); changeColor1(this.value)">
+            <div class="color-preview" id="preview1" style="background-color: #ff0000;">#FF0000</div>
+          </div>
+          <div class="preset-colors">
+            <div class="preset-color-btn" style="background-color: #ff0000;" onclick="setColor(1, '#ff0000')" title="Red"></div>
+            <div class="preset-color-btn" style="background-color: #00ff00;" onclick="setColor(1, '#00ff00')" title="Green"></div>
+            <div class="preset-color-btn" style="background-color: #0000ff;" onclick="setColor(1, '#0000ff')" title="Blue"></div>
+            <div class="preset-color-btn" style="background-color: #ffff00;" onclick="setColor(1, '#ffff00')" title="Yellow"></div>
+            <div class="preset-color-btn" style="background-color: #ff00ff;" onclick="setColor(1, '#ff00ff')" title="Magenta"></div>
+            <div class="preset-color-btn" style="background-color: #00ffff;" onclick="setColor(1, '#00ffff')" title="Cyan"></div>
+          </div>
+        </div>
 
-  <br><br>
+        <div class="color-picker-item">
+          <label for="Color2">Color 2</label>
+          <div class="color-picker-wrapper">
+            <input type="color" id="Color2" name="Color2" value="#00ff00" onchange="updateColorPreview(2, this.value); changeColor2(this.value)">
+            <div class="color-preview" id="preview2" style="background-color: #00ff00;">#00FF00</div>
+          </div>
+          <div class="preset-colors">
+            <div class="preset-color-btn" style="background-color: #ff0000;" onclick="setColor(2, '#ff0000')" title="Red"></div>
+            <div class="preset-color-btn" style="background-color: #00ff00;" onclick="setColor(2, '#00ff00')" title="Green"></div>
+            <div class="preset-color-btn" style="background-color: #0000ff;" onclick="setColor(2, '#0000ff')" title="Blue"></div>
+            <div class="preset-color-btn" style="background-color: #ffff00;" onclick="setColor(2, '#ffff00')" title="Yellow"></div>
+            <div class="preset-color-btn" style="background-color: #ff00ff;" onclick="setColor(2, '#ff00ff')" title="Magenta"></div>
+            <div class="preset-color-btn" style="background-color: #00ffff;" onclick="setColor(2, '#00ffff')" title="Cyan"></div>
+          </div>
+        </div>
 
-  <label for="group2Input">Enter LED Group:</label>
-  <input type="text" id="group2Input" placeholder="e.g., 0-50, 55, 60-65">
-  <button onclick="sendGroup(2)">Send Group</button>
+        <div class="color-picker-item">
+          <label for="Color3">Color 3</label>
+          <div class="color-picker-wrapper">
+            <input type="color" id="Color3" name="Color3" value="#0000ff" onchange="updateColorPreview(3, this.value); changeColor3(this.value)">
+            <div class="color-preview" id="preview3" style="background-color: #0000ff;">#0000FF</div>
+          </div>
+          <div class="preset-colors">
+            <div class="preset-color-btn" style="background-color: #ff0000;" onclick="setColor(3, '#ff0000')" title="Red"></div>
+            <div class="preset-color-btn" style="background-color: #00ff00;" onclick="setColor(3, '#00ff00')" title="Green"></div>
+            <div class="preset-color-btn" style="background-color: #0000ff;" onclick="setColor(3, '#0000ff')" title="Blue"></div>
+            <div class="preset-color-btn" style="background-color: #ffff00;" onclick="setColor(3, '#ffff00')" title="Yellow"></div>
+            <div class="preset-color-btn" style="background-color: #ff00ff;" onclick="setColor(3, '#ff00ff')" title="Magenta"></div>
+            <div class="preset-color-btn" style="background-color: #00ffff;" onclick="setColor(3, '#00ffff')" title="Cyan"></div>
+          </div>
+        </div>
 
-  <br><br>
+        <div class="color-picker-item">
+          <label for="Color4">Color 4</label>
+          <div class="color-picker-wrapper">
+            <input type="color" id="Color4" name="Color4" value="#ffffff" onchange="updateColorPreview(4, this.value); changeColor4(this.value)">
+            <div class="color-preview" id="preview4" style="background-color: #ffffff;">#FFFFFF</div>
+          </div>
+          <div class="preset-colors">
+            <div class="preset-color-btn" style="background-color: #ff0000;" onclick="setColor(4, '#ff0000')" title="Red"></div>
+            <div class="preset-color-btn" style="background-color: #00ff00;" onclick="setColor(4, '#00ff00')" title="Green"></div>
+            <div class="preset-color-btn" style="background-color: #0000ff;" onclick="setColor(4, '#0000ff')" title="Blue"></div>
+            <div class="preset-color-btn" style="background-color: #ffff00;" onclick="setColor(4, '#ffff00')" title="Yellow"></div>
+            <div class="preset-color-btn" style="background-color: #ff00ff;" onclick="setColor(4, '#ff00ff')" title="Magenta"></div>
+            <div class="preset-color-btn" style="background-color: #00ffff;" onclick="setColor(4, '#00ffff')" title="Cyan"></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <label for="group3Input">Enter LED Group:</label>
-  <input type="text" id="group3Input" placeholder="e.g., 0-50, 55, 60-65">
-  <button onclick="sendGroup(3)">Send Group</button>
+    <div class="card">
+      <h2>Performance Settings</h2>
+      <div class="form-group">
+        <div class="range-group">
+          <label for="fps">FPS</label>
+          <input type="range" id="fps" name="fps" min="1" max="66" value="30" oninput="updateRangeValue('fps', this.value); changeFPS(this.value)">
+          <span class="range-value" id="fpsValue">30</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="range-group">
+          <label for="brightness">Brightness</label>
+          <input type="range" id="brightness" name="brightness" min="0" max="255" value="128" oninput="updateRangeValue('brightness', this.value); changeBrightness(this.value)">
+          <span class="range-value" id="brightnessValue">128</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="range-group">
+          <label for="fadeAmount">Fade Amount</label>
+          <input type="range" id="fadeAmount" name="fadeAmount" min="0" max="255" value="128" oninput="updateRangeValue('fadeAmount', this.value); changeFadeAmount(this.value)">
+          <span class="range-value" id="fadeAmountValue">128</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="range-group">
+          <label for="fps_variability">FPS Variability</label>
+          <input type="range" id="fps_variability" name="fps_variability" min="0" max="66" value="0" oninput="updateRangeValue('fps_variability', this.value); changeFPS_Variability(this.value)">
+          <span class="range-value" id="fps_variabilityValue">0</span>
+        </div>
+      </div>
+    </div>
 
-  <br><br>
+    <div class="card">
+      <h2>Twinkle Settings</h2>
+      <div class="form-group">
+        <div class="range-group">
+          <label for="twinkleSpeed">Twinkle Speed</label>
+          <input type="range" id="twinkleSpeed" name="twinkleSpeed" min="0" max="8" value="4" oninput="updateRangeValue('twinkleSpeed', this.value); changeTwinkleSpeed(this.value)">
+          <span class="range-value" id="twinkleSpeedValue">4</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="range-group">
+          <label for="twinkleDensity">Twinkle Density</label>
+          <input type="range" id="twinkleDensity" name="twinkleDensity" min="0" max="8" value="4" oninput="updateRangeValue('twinkleDensity', this.value); changeTwinkleDensity(this.value)">
+          <span class="range-value" id="twinkleDensityValue">4</span>
+        </div>
+      </div>
+    </div>
 
-  <label for="group4Input">Enter LED Group:</label>
-  <input type="text" id="group4Input" placeholder="e.g., 0-50, 55, 60-65">
-  <button onclick="sendGroup(4)">Send Group</button>
+    <div class="grid-2">
+      <div class="card">
+        <h2>Range Control</h2>
+        <div class="form-group">
+          <div class="form-row-2">
+            <div>
+              <label for="startRange">Start Range</label>
+              <input type="number" id="startRange" name="startRange" placeholder="Start">
+            </div>
+            <div>
+              <label for="endRange">End Range</label>
+              <input type="number" id="endRange" name="endRange" placeholder="End">
+            </div>
+          </div>
+          <button onclick="sendRange()" style="margin-top: 12px; width: 100%;">Apply Range</button>
+        </div>
+      </div>
 
-  <br><br>
-
-  <label for="group5Input">Enter LED Group:</label>
-  <input type="text" id="group5Input" placeholder="e.g., 0-50, 55, 60-65">
-  <button onclick="sendGroup(5)">Send Group</button>
-
-  <br><br>
-
-  <label for="incgHueState">Enable gHue Increment:</label>
-  <input type="checkbox" id="incgHueState" checked>
-  <button onclick="sendIncgHueState()">Apply</button>
-
-  <br><br>
-
-  <label for="startRange">Start Range:</label>
-  <input type="number" id="startRange" name="startRange">
-  <label for="endRange">End Range:</label>
-  <input type="number" id="endRange" name="endRange">
-  <button onclick="sendRange()">Apply Range</button>
-
-  <label for="audioBrightness">Audio Brightness:</label>
-  <input type="checkbox" id="audioBrightness" checked>
-  <button onclick="sendAudioBrightnessState()">Apply</button>
-
-  <br><br>
-
-  <label for="palette">Select Color Palette:</label>
-  <select id="palette">
-      <option value="0">RainbowColors</option>
-      <option value="1">RainbowStripeColors</option>
-      <option value="2">CloudColors</option>
-      <option value="3">LavaColors</option>
-      <option value="4">OceanColors</option>
-      <option value="5">ForestColors</option>
-      <option value="6">PartyColors</option>
-      <option value="7">HeatColors</option>
-      <option value="8">Retro</option>
-      <option value="9">Blue White</option>
-      <option value="10">Fairy Lifhts</option>
-      <option value="11">Red Green White</option>
-      <option value="12">Red White</option>
-      <option value="13">Snow</option>
-      <option value="14">Holly</option>
-      <option value="15">Ice</option>
-  </select>
-  <button onclick="sendPalette()">Change Palette</button>
-
-  <br><br>
-
-  <label for="Color1">Color 1:</label>
-  <input type="color" id="Color1" name="Color1" onchange="changeColor1(this.value)">
-
-  <br><br>
-
-  <label for="Color2">Color 2:</label>
-  <input type="color" id="Color2" name="Color2" onchange="changeColor2(this.value)">
-
-  <br><br>
-
-  <label for="Color3">Color 3:</label>
-  <input type="color" id="Color3" name="Color3" onchange="changeColor3(this.value)">
-
-  <br><br>
-
-  <label for="Color2">Color 4:</label>
-  <input type="color" id="Color4" name="Color4" onchange="changeColor4(this.value)">
-
-  <br><br>
-
-  <label for="fps">FPS:</label>
-  <input type="range" id="fps" name="fps" min="1" max="66" onchange="changeFPS(this.value)">
-
-  <br><br>
-
-  <label for="brightness">Brightness:</label>
-  <input type="range" id="brightness" name="brightness" min="0" max="255" onchange="changeBrightness(this.value)">
-
-  <br><br>
-
-  <label for="fadeAmount">Fade Amount:</label>
-  <input type="range" id="fadeAmount" name="fadeAmount" min="0" max="255" onchange="changeFadeAmount(this.value)">
-  
-  <br><br>
-
-  <label for="twinkleSpeed">Twinkle Speed:</label>
-  <input type="range" id="twinkleSpeed" name="twinkleSpeed" min="0" max="8" onchange="changeTwinkleSpeed(this.value)">
-
-  <br><br>
-
-  <label for="twinkleDensity">Twinkle Density:</label>
-  <input type="range" id="twinkleDensity" name="twinkleDensity" min="0" max="8" onchange="changeTwinkleDensity(this.value)">
-
-  <br><br>
-
-  <label for="coolLikeState">Enable Cool Like Incandescent:</label>
-  <input type="checkbox" id="coolLikeState" checked>
-  <button onclick="sendCoolLikeState()">Apply</button>
-
-  <br><br>
-
-  <label for="autoBgState">Enable Auto Background Color:</label>
-  <input type="checkbox" id="autoBgState" checked>
-  <button onclick="sendAutoBgState()">Apply</button>
-
-  <br><br>
-
-  <label for="fps_variability">FPS Variability:</label>
-  <input type="range" id="fps_variability" name="fps_variability" min="0" max="66" onchange="changeFPS_Variability(this.value)">
+      <div class="card">
+        <h2>Advanced Options</h2>
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="incgHueState" checked>
+            <label for="incgHueState">Enable gHue Increment</label>
+          </div>
+          <button onclick="sendIncgHueState()" style="margin-top: 8px; width: 100%;">Apply</button>
+        </div>
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="audioBrightness" checked>
+            <label for="audioBrightness">Audio Brightness</label>
+          </div>
+          <button onclick="sendAudioBrightnessState()" style="margin-top: 8px; width: 100%;">Apply</button>
+        </div>
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="coolLikeState" checked>
+            <label for="coolLikeState">Cool Like Incandescent</label>
+          </div>
+          <button onclick="sendCoolLikeState()" style="margin-top: 8px; width: 100%;">Apply</button>
+        </div>
+        <div class="form-group">
+          <div class="checkbox-group">
+            <input type="checkbox" id="autoBgState" checked>
+            <label for="autoBgState">Auto Background Color</label>
+          </div>
+          <button onclick="sendAutoBgState()" style="margin-top: 8px; width: 100%;">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     var socket;
+    
+    function updateStatus(connected) {
+        var indicator = document.getElementById('statusIndicator');
+        var statusText = document.getElementById('statusText');
+        if (connected) {
+            indicator.classList.add('connected');
+            statusText.textContent = 'Connected';
+        } else {
+            indicator.classList.remove('connected');
+            statusText.textContent = 'Disconnected';
+        }
+    }
+
+    function updateRangeValue(id, value) {
+        document.getElementById(id + 'Value').textContent = value;
+    }
     
     function initWebSocket() {
         socket = new WebSocket('ws://' + window.location.hostname + '/ws_control');
         socket.onopen = function(event) {
             console.log('WebSocket connected');
+            updateStatus(true);
         };
         socket.onclose = function(event) {
             console.log('WebSocket disconnected');
+            updateStatus(false);
             setTimeout(initWebSocket, 2000);
+        };
+        socket.onerror = function(error) {
+            console.log('WebSocket error:', error);
+            updateStatus(false);
         };
         socket.onmessage = function(event) {
           console.log("Received message:", event.data);
@@ -252,42 +766,52 @@
               case 'Color 1':
                   color1 = message.value;
                   document.getElementById("Color1").value = color1;
+                  updateColorPreview(1, color1);
                   break;
               case 'Color 2':
                   color2 = message.value;
                   document.getElementById("Color2").value = color2;
+                  updateColorPreview(2, color2);
                   break; 
               case 'Color 3':
                   color3 = message.value;
                   document.getElementById("Color3").value = color3;
+                  updateColorPreview(3, color3);
                   break; 
               case 'Color 4':
                   color4 = message.value;
                   document.getElementById("Color4").value = color4;
+                  updateColorPreview(4, color4);
                   break; 
               case 'FPS':
                   fps = message.value;
                   document.getElementById("fps").value = fps;
+                  updateRangeValue('fps', fps);
                   break;
               case 'Fade Amount':
                   fadeAmount = message.value;
                   document.getElementById("fadeAmount").value = fadeAmount;
+                  updateRangeValue('fadeAmount', fadeAmount);
                   break;
               case 'Brightness':
                   brightness = message.value;
                   document.getElementById("brightness").value = brightness;
+                  updateRangeValue('brightness', brightness);
                   break;
               case 'FPS Variability':
                   fps_variability = message.value;
                   document.getElementById("fps_variability").value = fps_variability;
+                  updateRangeValue('fps_variability', fps_variability);
                   break;
               case 'Twinkle Speed':
                   twinkleSpeed = message.value;
                   document.getElementById("twinkleSpeed").value = twinkleSpeed;
+                  updateRangeValue('twinkleSpeed', twinkleSpeed);
                   break;
               case 'Twinkle Density':
                   twinkleDensity = message.value;
                   document.getElementById("twinkleDensity").value = twinkleDensity;
+                  updateRangeValue('twinkleDensity', twinkleDensity);
                   break;
               case 'Cool Like':
                   coolLikeState = message.value;
@@ -350,7 +874,26 @@
         socket.send(message);
     }
 
-    window.onload = initWebSocket;
+    window.onload = function() {
+        initWebSocket();
+        // Initialize color previews with default values
+        var color1 = document.getElementById("Color1").value;
+        var color2 = document.getElementById("Color2").value;
+        var color3 = document.getElementById("Color3").value;
+        var color4 = document.getElementById("Color4").value;
+        updateColorPreview(1, color1);
+        updateColorPreview(2, color2);
+        updateColorPreview(3, color3);
+        updateColorPreview(4, color4);
+        
+        // Initialize range values
+        updateRangeValue('fps', document.getElementById("fps").value);
+        updateRangeValue('brightness', document.getElementById("brightness").value);
+        updateRangeValue('fadeAmount', document.getElementById("fadeAmount").value);
+        updateRangeValue('fps_variability', document.getElementById("fps_variability").value);
+        updateRangeValue('twinkleSpeed', document.getElementById("twinkleSpeed").value);
+        updateRangeValue('twinkleDensity', document.getElementById("twinkleDensity").value);
+    };
 
     function sendMode() {
       var mode = document.getElementById("mode").value;
@@ -380,6 +923,56 @@
     function sendPalette() {
       var palette = document.getElementById("palette").value;
       sendMessage("Palette", palette);
+    }
+
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    function getLuminance(hex) {
+        var rgb = hexToRgb(hex);
+        if (!rgb) return 0;
+        return (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+    }
+
+    function updateColorPreview(colorNum, hexValue) {
+        var preview = document.getElementById("preview" + colorNum);
+        var hexUpper = hexValue.toUpperCase();
+        preview.style.backgroundColor = hexValue;
+        preview.textContent = hexUpper;
+        
+        // Adjust text color based on background brightness
+        if (getLuminance(hexValue) > 0.5) {
+            preview.classList.remove("dark-text");
+        } else {
+            preview.classList.add("dark-text");
+        }
+    }
+
+    function setColor(colorNum, hexValue) {
+        var colorInput = document.getElementById("Color" + colorNum);
+        colorInput.value = hexValue;
+        updateColorPreview(colorNum, hexValue);
+        
+        switch(colorNum) {
+            case 1:
+                changeColor1(hexValue);
+                break;
+            case 2:
+                changeColor2(hexValue);
+                break;
+            case 3:
+                changeColor3(hexValue);
+                break;
+            case 4:
+                changeColor4(hexValue);
+                break;
+        }
     }
 
     function changeColor1(value) {
