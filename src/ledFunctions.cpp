@@ -873,6 +873,7 @@ void gradientRings(uint8_t brightness) {
 void twinklingRings(uint8_t brightness) {
     static uint32_t lastUpdate = 0;
     static bool ringStates[100] = {false}; // Support up to 100 rings
+    const int maxStoredRings = sizeof(ringStates) / sizeof(ringStates[0]);
     
     // Update ring states periodically
     int updateInterval = (ringSpeed > 0) ? (1000 / ringSpeed) : 1000;
@@ -880,8 +881,9 @@ void twinklingRings(uint8_t brightness) {
         lastUpdate = millis();
         
         int maxRings = getRingCount();
+        int ringsToProcess = min(maxRings, maxStoredRings);
         // Randomly toggle rings
-        for (int r = 0; r < maxRings && r < 100; r++) {
+        for (int r = 0; r < ringsToProcess; r++) {
             if (random8() < 15) { // 15% chance to toggle
                 ringStates[r] = !ringStates[r];
             }
@@ -893,9 +895,10 @@ void twinklingRings(uint8_t brightness) {
     
     // Light up active rings
     int maxRings = getRingCount();
+    int ringsToRender = min(maxRings, maxStoredRings);
     for (int i = 0; i < NUM_LEDS; i++) {
         int ring = getRingForLED(i);
-        if (ring >= 0 && ring < maxRings && ringStates[ring]) {
+        if (ring >= 0 && ring < ringsToRender && ringStates[ring]) {
             uint8_t ringBrightness = ringIntensity;
             ringBrightness = scale8(ringBrightness, brightness);
             
