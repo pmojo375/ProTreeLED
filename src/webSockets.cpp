@@ -76,6 +76,58 @@ void onWebSocketControlEvent(AsyncWebSocket *server,
                          String(startRange) + "\"}");
     sendMessageToClients("{\"type\":\"End Range\",\"value\":\"" +
                          String(endRange) + "\"}");
+    sendMessageToClients("{\"type\":\"Aurora Speed\",\"value\":\"" +
+                         String(auroraSpeed) + "\"}");
+    sendMessageToClients("{\"type\":\"Aurora Intensity\",\"value\":\"" +
+                         String(auroraIntensity) + "\"}");
+    sendMessageToClients("{\"type\":\"Aurora Wave Count\",\"value\":\"" +
+                         String(auroraWaveCount) + "\"}");
+    sendMessageToClients("{\"type\":\"Aurora Color Range\",\"value\":\"" +
+                         String(auroraColorRange) + "\"}");
+    sendMessageToClients("{\"type\":\"Ring Speed\",\"value\":\"" +
+                         String(ringSpeed) + "\"}");
+    sendMessageToClients("{\"type\":\"Ring Intensity\",\"value\":\"" +
+                         String(ringIntensity) + "\"}");
+    sendMessageToClients("{\"type\":\"Tree Height\",\"value\":\"" +
+                         String((int)treeHeight) + "\"}");
+    sendMessageToClients("{\"type\":\"Tree Taper Ratio\",\"value\":\"" +
+                         String((int)(treeTaperRatio * 100)) + "\"}");
+    sendMessageToClients("{\"type\":\"Test Ring Number\",\"value\":\"" +
+                         String(testRingNumber) + "\"}");
+    sendMessageToClients("{\"type\":\"Bottom Ring LEDs\",\"value\":\"" +
+                         String(bottomRingLEDs) + "\"}");
+    sendMessageToClients("{\"type\":\"Middle Ring LEDs\",\"value\":\"" +
+                         String(middleRingLEDs) + "\"}");
+    sendMessageToClients("{\"type\":\"Top Ring LEDs\",\"value\":\"" +
+                         String(topRingLEDs) + "\"}");
+    sendMessageToClients("{\"type\":\"Top Zone Height\",\"value\":\"" +
+                         String((int)(topZoneHeight * 100)) + "\"}");
+    sendMessageToClients("{\"type\":\"Breathing Rate\",\"value\":\"" +
+                         String(breathingRate) + "\"}");
+    sendMessageToClients("{\"type\":\"Breathing Variability\",\"value\":\"" +
+                         String(breathingVariability) + "\"}");
+    sendMessageToClients("{\"type\":\"Breath Hold Time\",\"value\":\"" +
+                         String(breathHoldTime) + "\"}");
+    sendMessageToClients("{\"type\":\"Audio Min Amplitude\",\"value\":\"" +
+                         String((int)audioMinAmplitude) + "\"}");
+    sendMessageToClients("{\"type\":\"Audio Max Amplitude\",\"value\":\"" +
+                         String((int)audioMaxAmplitude) + "\"}");
+    sendMessageToClients("{\"type\":\"Audio Smoothing\",\"value\":\"" +
+                         String((int)(audioSmoothing * 100)) + "\"}");
+    sendMessageToClients("{\"type\":\"Audio Color Speed\",\"value\":\"" +
+                         String(audioColorSpeed) + "\"}");
+    sendMessageToClients("{\"type\":\"Audio Wave Speed\",\"value\":\"" +
+                         String(audioWaveSpeed) + "\"}");
+    sendMessageToClients("{\"type\":\"Auto Brightness Enabled\",\"value\":\"" +
+                         String(autoBrightnessEnabled ? "true" : "false") + "\"}");
+    sendMessageToClients("{\"type\":\"Auto Brightness Min Brightness\",\"value\":\"" +
+                         String(autoBrightnessMinBrightness) + "\"}");
+    sendMessageToClients("{\"type\":\"Auto Brightness Max Brightness\",\"value\":\"" +
+                         String(autoBrightnessMaxBrightness) + "\"}");
+    sendMessageToClients("{\"type\":\"Auto Brightness Min Amplitude\",\"value\":\"" +
+                         String((int)autoBrightnessMinAmplitude) + "\"}");
+    sendMessageToClients("{\"type\":\"Auto Brightness Max Amplitude\",\"value\":\"" +
+                         String((int)autoBrightnessMaxAmplitude) + "\"}");
   } else if (type == WS_EVT_DISCONNECT) {
     Serial.println("WebSocket client disconnected");
   } else if (type == WS_EVT_DATA) {
@@ -185,6 +237,134 @@ void onWebSocketControlEvent(AsyncWebSocket *server,
         autoSelectBackgroundColor = 1;
       } else {
         autoSelectBackgroundColor = 0;
+      }
+    } else if (type == "Aurora Speed") {
+      auroraSpeed = value.toInt();
+      if (auroraSpeed < 1) auroraSpeed = 1;
+      if (auroraSpeed > 20) auroraSpeed = 20;
+    } else if (type == "Aurora Intensity") {
+      auroraIntensity = value.toInt();
+      if (auroraIntensity < 50) auroraIntensity = 50;
+      if (auroraIntensity > 255) auroraIntensity = 255;
+    } else if (type == "Aurora Wave Count") {
+      auroraWaveCount = value.toInt();
+      if (auroraWaveCount < 1) auroraWaveCount = 1;
+      if (auroraWaveCount > 10) auroraWaveCount = 10;
+    } else if (type == "Aurora Color Range") {
+      auroraColorRange = value.toInt();
+      if (auroraColorRange < 20) auroraColorRange = 20;
+      if (auroraColorRange > 120) auroraColorRange = 120;
+    } else if (type == "Ring Speed") {
+      ringSpeed = value.toInt();
+      if (ringSpeed < 1) ringSpeed = 1;
+      if (ringSpeed > 30) ringSpeed = 30;
+    } else if (type == "Ring Intensity") {
+      ringIntensity = value.toInt();
+      if (ringIntensity < 50) ringIntensity = 50;
+      if (ringIntensity > 255) ringIntensity = 255;
+    } else if (type == "Tree Taper Ratio") {
+      treeTaperRatio = value.toFloat() / 100.0;
+      if (treeTaperRatio < 0.1) treeTaperRatio = 0.1;
+      if (treeTaperRatio > 1.0) treeTaperRatio = 1.0;
+      invalidateRingMap();
+    } else if (type == "Test Ring Number") {
+      testRingNumber = value.toInt();
+      if (testRingNumber < 0) testRingNumber = 0;
+      if (testRingNumber > 50) testRingNumber = 50;
+    } else if (type == "Bottom Ring LEDs") {
+      bottomRingLEDs = value.toInt();
+      if (bottomRingLEDs < 20) bottomRingLEDs = 20;
+      if (bottomRingLEDs > 150) bottomRingLEDs = 150;
+      invalidateRingMap();
+    } else if (type == "Middle Ring LEDs") {
+      middleRingLEDs = value.toInt();
+      if (middleRingLEDs < 5) middleRingLEDs = 5;
+      if (middleRingLEDs > 50) middleRingLEDs = 50;
+      invalidateRingMap();
+    } else if (type == "Top Ring LEDs") {
+      topRingLEDs = value.toInt();
+      if (topRingLEDs < 5) topRingLEDs = 5;
+      if (topRingLEDs > 50) topRingLEDs = 50;
+      invalidateRingMap();
+    } else if (type == "Top Zone Height") {
+      topZoneHeight = value.toFloat() / 100.0;
+      if (topZoneHeight < 0.1) topZoneHeight = 0.1;
+      if (topZoneHeight > 0.5) topZoneHeight = 0.5;
+      invalidateRingMap();
+    } else if (type == "Tree Height") {
+      treeHeight = value.toFloat();
+      if (treeHeight < 24) treeHeight = 24;
+      if (treeHeight > 120) treeHeight = 120;
+      invalidateRingMap();
+    } else if (type == "Breathing Rate") {
+      breathingRate = value.toInt();
+      if (breathingRate < 1) breathingRate = 1;
+      if (breathingRate > 100) breathingRate = 100;
+    } else if (type == "Breathing Variability") {
+      breathingVariability = value.toInt();
+      if (breathingVariability < 0) breathingVariability = 0;
+      if (breathingVariability > 50) breathingVariability = 50;
+    } else if (type == "Breath Hold Time") {
+      breathHoldTime = value.toInt();
+      if (breathHoldTime < 0) breathHoldTime = 0;
+      if (breathHoldTime > 100) breathHoldTime = 100;
+    } else if (type == "Audio Min Amplitude") {
+      audioMinAmplitude = value.toFloat();
+      if (audioMinAmplitude < 1.0) audioMinAmplitude = 1.0;
+      if (audioMinAmplitude > 100.0) audioMinAmplitude = 100.0;
+    } else if (type == "Audio Max Amplitude") {
+      audioMaxAmplitude = value.toFloat();
+      if (audioMaxAmplitude < 100.0) audioMaxAmplitude = 100.0;
+      if (audioMaxAmplitude > 5000.0) audioMaxAmplitude = 5000.0;
+    } else if (type == "Audio Smoothing") {
+      audioSmoothing = value.toFloat() / 100.0;
+      if (audioSmoothing < 0.0) audioSmoothing = 0.0;
+      if (audioSmoothing > 1.0) audioSmoothing = 1.0;
+    } else if (type == "Audio Color Speed") {
+      audioColorSpeed = value.toInt();
+      if (audioColorSpeed < 1) audioColorSpeed = 1;
+      if (audioColorSpeed > 100) audioColorSpeed = 100;
+    } else if (type == "Audio Wave Speed") {
+      audioWaveSpeed = value.toInt();
+      if (audioWaveSpeed < 1) audioWaveSpeed = 1;
+      if (audioWaveSpeed > 100) audioWaveSpeed = 100;
+    } else if (type == "Auto Brightness Enabled") {
+      if (value == "true") {
+        autoBrightnessEnabled = true;
+      } else {
+        autoBrightnessEnabled = false;
+      }
+    } else if (type == "Auto Brightness Min Brightness") {
+      autoBrightnessMinBrightness = value.toInt();
+      if (autoBrightnessMinBrightness < 0) autoBrightnessMinBrightness = 0;
+      if (autoBrightnessMinBrightness > 255) autoBrightnessMinBrightness = 255;
+      // Ensure min is not greater than max
+      if (autoBrightnessMinBrightness > autoBrightnessMaxBrightness) {
+        autoBrightnessMinBrightness = autoBrightnessMaxBrightness;
+      }
+    } else if (type == "Auto Brightness Max Brightness") {
+      autoBrightnessMaxBrightness = value.toInt();
+      if (autoBrightnessMaxBrightness < 0) autoBrightnessMaxBrightness = 0;
+      if (autoBrightnessMaxBrightness > 255) autoBrightnessMaxBrightness = 255;
+      // Ensure max is not less than min
+      if (autoBrightnessMaxBrightness < autoBrightnessMinBrightness) {
+        autoBrightnessMaxBrightness = autoBrightnessMinBrightness;
+      }
+    } else if (type == "Auto Brightness Min Amplitude") {
+      autoBrightnessMinAmplitude = value.toFloat();
+      if (autoBrightnessMinAmplitude < 0.0) autoBrightnessMinAmplitude = 0.0;
+      if (autoBrightnessMinAmplitude > 10000.0) autoBrightnessMinAmplitude = 10000.0;
+      // Ensure min is not greater than max
+      if (autoBrightnessMinAmplitude > autoBrightnessMaxAmplitude) {
+        autoBrightnessMinAmplitude = autoBrightnessMaxAmplitude;
+      }
+    } else if (type == "Auto Brightness Max Amplitude") {
+      autoBrightnessMaxAmplitude = value.toFloat();
+      if (autoBrightnessMaxAmplitude < 0.0) autoBrightnessMaxAmplitude = 0.0;
+      if (autoBrightnessMaxAmplitude > 10000.0) autoBrightnessMaxAmplitude = 10000.0;
+      // Ensure max is not less than min
+      if (autoBrightnessMaxAmplitude < autoBrightnessMinAmplitude) {
+        autoBrightnessMaxAmplitude = autoBrightnessMinAmplitude;
       }
     }
 

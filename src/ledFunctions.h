@@ -3,7 +3,7 @@
 
 #include <FastLED.h>
 
-#define NUM_LEDS 450
+#define NUM_LEDS 400
 #define DATA_PIN 5
 #define LED_TYPE WS2811
 #define COLOR_ORDER RGB
@@ -25,6 +25,42 @@ extern int coolLikeIncandescentEn;
 extern int startRange;
 extern int endRange;
 
+// Aurora Borealis Parameters
+extern int auroraSpeed;
+extern int auroraIntensity;
+extern int auroraWaveCount;
+extern int auroraColorRange;
+
+// Ring-based Pattern Parameters
+extern int ringSpeed;
+extern int ringIntensity;
+extern float treeHeight; // Tree height in inches
+extern float treeTaperRatio; // Ratio of top diameter to bottom diameter (0.0 to 1.0)
+extern int testRingNumber; // Ring number to display for testing
+extern int bottomRingLEDs; // Target LEDs per ring in bottom zone (50-100)
+extern int middleRingLEDs; // Target LEDs per ring in middle zone (~20)
+extern int topRingLEDs; // Target LEDs per ring in top zone (~15)
+extern float topZoneHeight; // Height ratio for top zone (0.0 to 1.0, e.g. 0.25 = top 25%)
+
+// Breathing Pattern Parameters
+extern int breathingRate; // Speed of breathing cycle (1-100)
+extern int breathingVariability; // Random variation in timing (0-50)
+extern int breathHoldTime; // Time to hold at peak brightness (0-100)
+
+// Audio Visualization Parameters
+extern float audioMinAmplitude; // Minimum amplitude threshold for audio modes
+extern float audioMaxAmplitude; // Maximum amplitude threshold for audio modes
+extern float audioSmoothing; // Smoothing factor (0.0-1.0, higher = more smoothing)
+extern int audioColorSpeed; // Color shift speed for mode 20 (1-100)
+extern int audioWaveSpeed; // Wave speed multiplier for mode 20 (1-100)
+
+// Auto Brightness Parameters
+extern bool autoBrightnessEnabled; // Enable/disable auto brightness based on amplitude
+extern uint8_t autoBrightnessMinBrightness; // Minimum brightness value (0-255)
+extern uint8_t autoBrightnessMaxBrightness; // Maximum brightness value (0-255)
+extern float autoBrightnessMinAmplitude; // Amplitude threshold for minimum brightness
+extern float autoBrightnessMaxAmplitude; // Amplitude threshold for maximum brightness
+
 // Default Colors
 extern CRGB color1;
 extern CRGB color2;
@@ -39,7 +75,6 @@ extern uint8_t fadeAmount;
 extern int mode;
 extern bool setBrightness;
 extern uint8_t brightness;
-extern bool setBrightness;
 
 void Fire2012WithPalette();
 
@@ -65,7 +100,26 @@ void twinklingStars(CRGB color1, uint8_t brightness);
 
 void candyCane(CRGB color1, CRGB color2, uint8_t brightness);
 
-void risingSparklesEffect();
+void risingSparklesEffect(uint8_t brightness);
+
+void auroraBorealis(uint8_t brightness);
+
+// Ring-based pattern functions
+int getRingForLED(int ledIndex);
+int getLEDsInRing(int ringIndex);
+int getFirstLEDInRing(int ringIndex);
+int getRingCount();
+float getLEDHeight(int ledIndex);
+void invalidateRingMap(); // Call this when ring parameters change
+void spiralRings(uint8_t brightness);
+void expandingRings(uint8_t brightness);
+void chasingRings(uint8_t brightness);
+void gradientRings(uint8_t brightness);
+void twinklingRings(uint8_t brightness);
+void waveRings(uint8_t brightness);
+
+void singleRingTest(uint8_t brightness);
+void breathingEffect(uint8_t brightness);
 
 void setAll(CRGB color);
 
@@ -94,5 +148,13 @@ uint8_t hexStringToUint8(String hexString);
 
 // Function to convert a hex color string to a CRGB object
 CRGB hexToCRGB(String hexColor);
+
+// Audio visualization functions
+void audioAmplitudeEffect(uint8_t brightness);
+void fftEqualizerEffect(uint8_t brightness);
+void audioColorSpectrumEffect(uint8_t brightness);
+
+// Auto brightness function
+uint8_t calculateAutoBrightness(uint8_t baseBrightness);
 
 #endif

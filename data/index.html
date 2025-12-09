@@ -1,1030 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LED Christmas Tree Control</title>
-  <style>
-      * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-      }
-
-      :root {
-          --bg-primary: #0f0f0f;
-          --bg-secondary: #1a1a1a;
-          --bg-tertiary: #252525;
-          --bg-card: #1e1e1e;
-          --text-primary: #e0e0e0;
-          --text-secondary: #b0b0b0;
-          --accent: #4CAF50;
-          --accent-hover: #45a049;
-          --accent-light: #66bb6a;
-          --border: #333;
-          --border-light: #444;
-          --shadow: rgba(0, 0, 0, 0.3);
-          --shadow-lg: rgba(0, 0, 0, 0.5);
-      }
-
-      body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-          background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-          color: var(--text-primary);
-          padding: 20px;
-          min-height: 100vh;
-          line-height: 1.6;
-      }
-
-      .container {
-          max-width: 1400px;
-          margin: 0 auto;
-      }
-
-      header {
-          text-align: center;
-          margin-bottom: 40px;
-          padding: 30px 0;
-      }
-
-      h1 {
-          font-size: 2.5rem;
-          font-weight: 700;
-          background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin-bottom: 10px;
-          letter-spacing: -0.5px;
-      }
-
-      .status-indicator {
-          display: inline-block;
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background-color: #666;
-          margin-right: 8px;
-          animation: pulse 2s infinite;
-      }
-
-      .status-indicator.connected {
-          background-color: var(--accent);
-      }
-
-      @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-      }
-
-      .card {
-          background: var(--bg-card);
-          border: 1px solid var(--border);
-          border-radius: 12px;
-          padding: 24px;
-          margin-bottom: 24px;
-          box-shadow: 0 4px 6px var(--shadow);
-          transition: transform 0.2s, box-shadow 0.2s;
-      }
-
-      .card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 16px var(--shadow-lg);
-      }
-
-      .card h2 {
-          font-size: 1.5rem;
-          font-weight: 600;
-          color: var(--accent);
-          margin-bottom: 20px;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-      }
-
-      .card h2::before {
-          content: '';
-          width: 4px;
-          height: 24px;
-          background: var(--accent);
-          border-radius: 2px;
-      }
-
-      label {
-          display: block;
-          margin-bottom: 8px;
-          font-weight: 500;
-          color: var(--text-primary);
-          font-size: 0.95rem;
-      }
-
-      input[type="text"],
-      input[type="number"],
-      select {
-          width: 100%;
-          padding: 12px 16px;
-          background: var(--bg-tertiary);
-          border: 1px solid var(--border);
-          border-radius: 8px;
-          color: var(--text-primary);
-          font-size: 1rem;
-          transition: all 0.2s;
-          font-family: inherit;
-      }
-
-      input[type="text"]:focus,
-      input[type="number"]:focus,
-      select:focus {
-          outline: none;
-          border-color: var(--accent);
-          box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
-      }
-
-      input[type="text"]::placeholder {
-          color: var(--text-secondary);
-      }
-
-      input[type="range"] {
-          width: 100%;
-          height: 8px;
-          background: var(--bg-tertiary);
-          border-radius: 4px;
-          outline: none;
-          -webkit-appearance: none;
-          appearance: none;
-      }
-
-      input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 20px;
-          height: 20px;
-          background: var(--accent);
-          border-radius: 50%;
-          cursor: pointer;
-          transition: all 0.2s;
-      }
-
-      input[type="range"]::-webkit-slider-thumb:hover {
-          transform: scale(1.2);
-          box-shadow: 0 0 0 8px rgba(76, 175, 80, 0.2);
-      }
-
-      input[type="range"]::-moz-range-thumb {
-          width: 20px;
-          height: 20px;
-          background: var(--accent);
-          border-radius: 50%;
-          cursor: pointer;
-          border: none;
-          transition: all 0.2s;
-      }
-
-      input[type="range"]::-moz-range-thumb:hover {
-          transform: scale(1.2);
-      }
-
-      input[type="checkbox"] {
-          width: 20px;
-          height: 20px;
-          accent-color: var(--accent);
-          cursor: pointer;
-      }
-
-      button {
-          background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
-          color: white;
-          padding: 12px 24px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 1rem;
-          font-weight: 600;
-          transition: all 0.2s;
-          box-shadow: 0 2px 4px var(--shadow);
-      }
-
-      button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 8px var(--shadow-lg);
-      }
-
-      button:active {
-          transform: translateY(0);
-      }
-
-      .form-group {
-          margin-bottom: 20px;
-      }
-
-      .form-row {
-          display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 12px;
-          align-items: end;
-      }
-
-      .form-row-2 {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
-      }
-
-      .checkbox-group {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-      }
-
-      .checkbox-group label {
-          margin: 0;
-          cursor: pointer;
-      }
-
-      .color-picker-section {
-          background: var(--bg-card);
-          border: 1px solid var(--border);
-          border-radius: 12px;
-          padding: 24px;
-          margin-bottom: 24px;
-          box-shadow: 0 4px 6px var(--shadow);
-      }
-
-      .color-picker-section h2 {
-          font-size: 1.5rem;
-          font-weight: 600;
-          color: var(--accent);
-          margin-bottom: 20px;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-      }
-
-      .color-picker-section h2::before {
-          content: '';
-          width: 4px;
-          height: 24px;
-          background: var(--accent);
-          border-radius: 2px;
-      }
-
-      .color-picker-group {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-          gap: 24px;
-          margin-top: 20px;
-      }
-
-      .color-picker-item {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-      }
-
-      .color-picker-item label {
-          font-weight: 600;
-          color: var(--text-primary);
-          margin: 0;
-          font-size: 1rem;
-      }
-
-      .color-picker-wrapper {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-      }
-
-      input[type=color] {
-          width: 80px;
-          height: 60px;
-          padding: 4px;
-          border: 2px solid var(--border);
-          border-radius: 10px;
-          cursor: pointer;
-          transition: all 0.2s;
-          background: var(--bg-tertiary);
-      }
-
-      input[type=color]:hover {
-          transform: scale(1.05);
-          border-color: var(--accent);
-          box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-      }
-
-      .color-preview {
-          flex: 1;
-          height: 60px;
-          border-radius: 10px;
-          border: 2px solid var(--border);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: 'Courier New', monospace;
-          font-weight: bold;
-          font-size: 0.95rem;
-          color: var(--text-primary);
-          background: var(--bg-tertiary);
-          transition: all 0.2s;
-      }
-
-      .color-preview.dark-text {
-          color: #fff;
-          text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-      }
-
-      .preset-colors {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-top: 8px;
-      }
-
-      .preset-color-btn {
-          width: 36px;
-          height: 36px;
-          border-radius: 8px;
-          border: 2px solid var(--border);
-          cursor: pointer;
-          transition: all 0.2s;
-      }
-
-      .preset-color-btn:hover {
-          transform: scale(1.15);
-          border-color: var(--accent);
-          box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
-      }
-
-      .range-group {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-      }
-
-      .range-group label {
-          min-width: 140px;
-          margin: 0;
-      }
-
-      .range-value {
-          min-width: 50px;
-          text-align: right;
-          color: var(--accent);
-          font-weight: 600;
-          font-family: 'Courier New', monospace;
-      }
-
-      .grid-2 {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 24px;
-      }
-
-      .led-groups {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 16px;
-      }
-
-      .led-group-item {
-          background: var(--bg-tertiary);
-          padding: 16px;
-          border-radius: 8px;
-          border: 1px solid var(--border);
-      }
-
-      @media (max-width: 768px) {
-          body {
-              padding: 12px;
-          }
-
-          h1 {
-              font-size: 2rem;
-          }
-
-          .card {
-              padding: 16px;
-          }
-
-          .form-row {
-              grid-template-columns: 1fr;
-          }
-
-          .form-row-2 {
-              grid-template-columns: 1fr;
-          }
-
-          .color-picker-group {
-              grid-template-columns: 1fr;
-          }
-      }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LED Christmas Tree Control</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:20px;color:#333;}
+.container{max-width:1200px;margin:0 auto;}
+header{background:rgba(255,255,255,0.95);padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 4px 6px rgba(0,0,0,0.1);}
+header h1{color:#667eea;margin-bottom:10px;}
+.status-indicator{display:inline-block;width:12px;height:12px;border-radius:50%;background:#ccc;margin-right:8px;vertical-align:middle;}
+.status-indicator.connected{background:#4caf50;box-shadow:0 0 8px #4caf50;}
+.card{background:rgba(255,255,255,0.95);padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 4px 6px rgba(0,0,0,0.1);}
+.card h2{color:#667eea;margin-bottom:15px;font-size:1.3em;}
+.form-group{margin-bottom:15px;}
+.form-group label{display:block;margin-bottom:5px;font-weight:500;color:#555;}
+.form-row{display:flex;gap:10px;align-items:center;}
+.form-row select,.form-row input[type="text"]{flex:1;padding:8px;border:1px solid #ddd;border-radius:5px;font-size:14px;}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.form-row-2 input{width:100%;padding:8px;border:1px solid #ddd;border-radius:5px;}
+button{background:#667eea;color:white;border:none;padding:8px 16px;border-radius:5px;cursor:pointer;font-size:14px;transition:background 0.3s;}
+button:hover{background:#5568d3;}
+button:active{transform:scale(0.98);}
+.led-groups{display:flex;flex-direction:column;gap:15px;}
+.led-group-item{display:flex;flex-direction:column;gap:8px;}
+.led-group-item label{font-weight:500;color:#555;}
+.color-picker-section{background:rgba(255,255,255,0.95);padding:20px;border-radius:10px;margin-bottom:20px;box-shadow:0 4px 6px rgba(0,0,0,0.1);}
+.color-picker-section h2{color:#667eea;margin-bottom:15px;font-size:1.3em;}
+.color-picker-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;}
+.color-picker-item{display:flex;flex-direction:column;gap:10px;}
+.color-picker-wrapper{display:flex;gap:10px;align-items:center;}
+.color-picker-wrapper input[type="color"]{width:60px;height:40px;border:none;border-radius:5px;cursor:pointer;}
+.color-preview{padding:8px 12px;border-radius:5px;font-weight:500;min-width:100px;text-align:center;color:#333;border:1px solid #ddd;}
+.color-preview.dark-text{color:#fff;}
+.preset-colors{display:flex;gap:5px;flex-wrap:wrap;}
+.preset-color-btn{width:30px;height:30px;border-radius:5px;cursor:pointer;border:2px solid #ddd;transition:transform 0.2s;}
+.preset-color-btn:hover{transform:scale(1.1);border-color:#667eea;}
+.range-group{display:flex;align-items:center;gap:10px;}
+.range-group label{min-width:120px;margin-bottom:0;}
+.range-group input[type="range"]{flex:1;}
+.range-value{min-width:40px;text-align:right;font-weight:500;color:#667eea;}
+input[type="range"]{cursor:pointer;}
+input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:5px;width:100%;}
+.checkbox-group{display:flex;align-items:center;gap:8px;}
+.checkbox-group input[type="checkbox"]{width:18px;height:18px;cursor:pointer;}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;}
+.card p{color:#666;font-size:0.9em;margin-top:5px;}
+#micRMSValue{font-size:1.5em;font-weight:bold;color:#667eea;}
+</style>
 </head>
-
 <body>
-  <div class="container">
-    <header>
-      <h1>LED Christmas Tree Control</h1>
-      <p style="color: var(--text-secondary);">
-        <span class="status-indicator" id="statusIndicator"></span>
-        <span id="statusText">Connecting...</span>
-      </p>
-    </header>
+<div class="container">
+<header>
+<h1>LED Christmas Tree Control</h1>
+<p><span class="status-indicator" id="statusIndicator"></span><span id="statusText">Connecting...</span></p>
+</header>
 
-    <div class="card">
-      <h2>Mode Selection</h2>
-      <div class="form-group">
-        <label for="mode">Function Mode</label>
-        <div class="form-row">
-          <select id="mode">
-            <option value="0">Normal</option>
-            <option value="1">Color Waves</option>
-            <option value="2">Twinkling Stars</option>
-            <option value="3">Candy Cane</option>
-            <option value="4">Rising Sparkles</option>
-            <option value="5">Twinkle Fox</option>
-            <option value="6">Fire</option>
-            <option value="7">Set Range</option>
-            <option value="8">Group Test</option>
-          </select>
-          <button onclick="sendMode()">Apply</button>
-        </div>
-      </div>
-    </div>
+<div class="card">
+<h2>Mode Selection</h2>
+<div class="form-group">
+<label for="mode">Function Mode</label>
+<div class="form-row">
+<select id="mode">
+<option value="0">Normal</option><option value="1">Color Waves</option><option value="2">Twinkling Stars</option><option value="3">Candy Cane</option><option value="4">Rising Sparkles</option><option value="5">Twinkle Fox</option><option value="6">Fire</option><option value="7">Set Range</option><option value="8">Group Test</option><option value="9">Aurora Borealis</option><option value="10">Spiral Rings</option><option value="11">Expanding Rings</option><option value="12">Chasing Rings</option><option value="13">Gradient Rings</option><option value="14">Twinkling Rings</option><option value="15">Wave Rings</option><option value="16">Single Ring Test</option><option value="17">Breathing</option><option value="18">Audio Amplitude</option><option value="19">FFT Equalizer</option><option value="20">Audio Color Spectrum</option>
+</select>
+<button onclick="sendMode()">Apply</button>
+</div>
+</div>
+</div>
 
-    <div class="card">
-      <h2>LED Groups</h2>
-      <div class="led-groups">
-        <div class="led-group-item">
-          <label for="group1Input">Group 1</label>
-          <div class="form-row">
-            <input type="text" id="group1Input" placeholder="e.g., 0-50, 55, 60-65">
-            <button onclick="sendGroup(1)">Send</button>
-          </div>
-        </div>
-        <div class="led-group-item">
-          <label for="group2Input">Group 2</label>
-          <div class="form-row">
-            <input type="text" id="group2Input" placeholder="e.g., 0-50, 55, 60-65">
-            <button onclick="sendGroup(2)">Send</button>
-          </div>
-        </div>
-        <div class="led-group-item">
-          <label for="group3Input">Group 3</label>
-          <div class="form-row">
-            <input type="text" id="group3Input" placeholder="e.g., 0-50, 55, 60-65">
-            <button onclick="sendGroup(3)">Send</button>
-          </div>
-        </div>
-        <div class="led-group-item">
-          <label for="group4Input">Group 4</label>
-          <div class="form-row">
-            <input type="text" id="group4Input" placeholder="e.g., 0-50, 55, 60-65">
-            <button onclick="sendGroup(4)">Send</button>
-          </div>
-        </div>
-        <div class="led-group-item">
-          <label for="group5Input">Group 5</label>
-          <div class="form-row">
-            <input type="text" id="group5Input" placeholder="e.g., 0-50, 55, 60-65">
-            <button onclick="sendGroup(5)">Send</button>
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="card">
+<h2>Microphone Test</h2>
+<div class="form-group">
+<label>RMS Amplitude</label>
+<div><div id="micRMSValue">0.00</div><p>Audio level from I2S microphone</p></div>
+</div>
+</div>
 
-    <div class="card">
-      <h2>Color Palette</h2>
-      <div class="form-group">
-        <label for="palette">Palette Selection</label>
-        <div class="form-row">
-          <select id="palette">
-            <option value="0">RainbowColors</option>
-            <option value="1">RainbowStripeColors</option>
-            <option value="2">CloudColors</option>
-            <option value="3">LavaColors</option>
-            <option value="4">OceanColors</option>
-            <option value="5">ForestColors</option>
-            <option value="6">PartyColors</option>
-            <option value="7">HeatColors</option>
-            <option value="8">Retro</option>
-            <option value="9">Blue White</option>
-            <option value="10">Fairy Lifhts</option>
-            <option value="11">Red Green White</option>
-            <option value="12">Red White</option>
-            <option value="13">Snow</option>
-            <option value="14">Holly</option>
-            <option value="15">Ice</option>
-          </select>
-          <button onclick="sendPalette()">Apply</button>
-        </div>
-      </div>
-    </div>
+<div class="card">
+<h2>LED Groups</h2>
+<div class="led-groups">
+<div class="led-group-item"><label for="group1Input">Group 1</label><div class="form-row"><input type="text" id="group1Input" placeholder="e.g., 0-50, 55, 60-65"><button onclick="sendGroup(1)">Send</button></div></div>
+<div class="led-group-item"><label for="group2Input">Group 2</label><div class="form-row"><input type="text" id="group2Input" placeholder="e.g., 0-50, 55, 60-65"><button onclick="sendGroup(2)">Send</button></div></div>
+<div class="led-group-item"><label for="group3Input">Group 3</label><div class="form-row"><input type="text" id="group3Input" placeholder="e.g., 0-50, 55, 60-65"><button onclick="sendGroup(3)">Send</button></div></div>
+<div class="led-group-item"><label for="group4Input">Group 4</label><div class="form-row"><input type="text" id="group4Input" placeholder="e.g., 0-50, 55, 60-65"><button onclick="sendGroup(4)">Send</button></div></div>
+<div class="led-group-item"><label for="group5Input">Group 5</label><div class="form-row"><input type="text" id="group5Input" placeholder="e.g., 0-50, 55, 60-65"><button onclick="sendGroup(5)">Send</button></div></div>
+</div>
+</div>
 
-    <div class="color-picker-section">
-      <h2>Color Selection</h2>
-      <div class="color-picker-group">
-        <div class="color-picker-item">
-          <label for="Color1">Color 1</label>
-          <div class="color-picker-wrapper">
-            <input type="color" id="Color1" name="Color1" value="#ff0000" onchange="updateColorPreview(1, this.value); changeColor1(this.value)">
-            <div class="color-preview" id="preview1" style="background-color: #ff0000;">#FF0000</div>
-          </div>
-          <div class="preset-colors">
-            <div class="preset-color-btn" style="background-color: #ff0000;" onclick="setColor(1, '#ff0000')" title="Red"></div>
-            <div class="preset-color-btn" style="background-color: #00ff00;" onclick="setColor(1, '#00ff00')" title="Green"></div>
-            <div class="preset-color-btn" style="background-color: #0000ff;" onclick="setColor(1, '#0000ff')" title="Blue"></div>
-            <div class="preset-color-btn" style="background-color: #ffff00;" onclick="setColor(1, '#ffff00')" title="Yellow"></div>
-            <div class="preset-color-btn" style="background-color: #ff00ff;" onclick="setColor(1, '#ff00ff')" title="Magenta"></div>
-            <div class="preset-color-btn" style="background-color: #00ffff;" onclick="setColor(1, '#00ffff')" title="Cyan"></div>
-          </div>
-        </div>
+<div class="card">
+<h2>Color Palette</h2>
+<div class="form-group">
+<label for="palette">Palette Selection</label>
+<div class="form-row">
+<select id="palette">
+<option value="0">RainbowColors</option><option value="1">RainbowStripeColors</option><option value="2">CloudColors</option><option value="3">LavaColors</option><option value="4">OceanColors</option><option value="5">ForestColors</option><option value="6">PartyColors</option><option value="7">HeatColors</option><option value="8">Retro</option><option value="9">Blue White</option><option value="10">Fairy Lifhts</option><option value="11">Red Green White</option><option value="12">Red White</option><option value="13">Snow</option><option value="14">Holly</option><option value="15">Ice</option>
+</select>
+<button onclick="sendPalette()">Apply</button>
+</div>
+</div>
+</div>
 
-        <div class="color-picker-item">
-          <label for="Color2">Color 2</label>
-          <div class="color-picker-wrapper">
-            <input type="color" id="Color2" name="Color2" value="#00ff00" onchange="updateColorPreview(2, this.value); changeColor2(this.value)">
-            <div class="color-preview" id="preview2" style="background-color: #00ff00;">#00FF00</div>
-          </div>
-          <div class="preset-colors">
-            <div class="preset-color-btn" style="background-color: #ff0000;" onclick="setColor(2, '#ff0000')" title="Red"></div>
-            <div class="preset-color-btn" style="background-color: #00ff00;" onclick="setColor(2, '#00ff00')" title="Green"></div>
-            <div class="preset-color-btn" style="background-color: #0000ff;" onclick="setColor(2, '#0000ff')" title="Blue"></div>
-            <div class="preset-color-btn" style="background-color: #ffff00;" onclick="setColor(2, '#ffff00')" title="Yellow"></div>
-            <div class="preset-color-btn" style="background-color: #ff00ff;" onclick="setColor(2, '#ff00ff')" title="Magenta"></div>
-            <div class="preset-color-btn" style="background-color: #00ffff;" onclick="setColor(2, '#00ffff')" title="Cyan"></div>
-          </div>
-        </div>
+<div class="color-picker-section">
+<h2>Color Selection</h2>
+<div class="color-picker-group">
+<div class="color-picker-item"><label for="Color1">Color 1</label><div class="color-picker-wrapper"><input type="color" id="Color1" value="#ff0000" onchange="updateColorPreview(1,this.value);changeColor(1,this.value)"><div class="color-preview" id="preview1">#FF0000</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(1,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(1,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(1,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(1,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(1,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(1,'#00ffff')" title="Cyan"></div></div></div>
+<div class="color-picker-item"><label for="Color2">Color 2</label><div class="color-picker-wrapper"><input type="color" id="Color2" value="#00ff00" onchange="updateColorPreview(2,this.value);changeColor(2,this.value)"><div class="color-preview" id="preview2">#00FF00</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(2,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(2,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(2,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(2,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(2,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(2,'#00ffff')" title="Cyan"></div></div></div>
+<div class="color-picker-item"><label for="Color3">Color 3</label><div class="color-picker-wrapper"><input type="color" id="Color3" value="#0000ff" onchange="updateColorPreview(3,this.value);changeColor(3,this.value)"><div class="color-preview" id="preview3">#0000FF</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(3,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(3,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(3,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(3,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(3,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(3,'#00ffff')" title="Cyan"></div></div></div>
+<div class="color-picker-item"><label for="Color4">Color 4</label><div class="color-picker-wrapper"><input type="color" id="Color4" value="#ffffff" onchange="updateColorPreview(4,this.value);changeColor(4,this.value)"><div class="color-preview" id="preview4">#FFFFFF</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(4,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(4,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(4,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(4,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(4,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(4,'#00ffff')" title="Cyan"></div></div></div>
+</div>
+</div>
 
-        <div class="color-picker-item">
-          <label for="Color3">Color 3</label>
-          <div class="color-picker-wrapper">
-            <input type="color" id="Color3" name="Color3" value="#0000ff" onchange="updateColorPreview(3, this.value); changeColor3(this.value)">
-            <div class="color-preview" id="preview3" style="background-color: #0000ff;">#0000FF</div>
-          </div>
-          <div class="preset-colors">
-            <div class="preset-color-btn" style="background-color: #ff0000;" onclick="setColor(3, '#ff0000')" title="Red"></div>
-            <div class="preset-color-btn" style="background-color: #00ff00;" onclick="setColor(3, '#00ff00')" title="Green"></div>
-            <div class="preset-color-btn" style="background-color: #0000ff;" onclick="setColor(3, '#0000ff')" title="Blue"></div>
-            <div class="preset-color-btn" style="background-color: #ffff00;" onclick="setColor(3, '#ffff00')" title="Yellow"></div>
-            <div class="preset-color-btn" style="background-color: #ff00ff;" onclick="setColor(3, '#ff00ff')" title="Magenta"></div>
-            <div class="preset-color-btn" style="background-color: #00ffff;" onclick="setColor(3, '#00ffff')" title="Cyan"></div>
-          </div>
-        </div>
+<div class="card">
+<h2>Performance Settings</h2>
+<div class="form-group"><div class="range-group"><label for="fps">FPS</label><input type="range" id="fps" min="1" max="66" value="30" oninput="updateRangeValue('fps',this.value);changeSetting('FPS',this.value)"><span class="range-value" id="fpsValue">30</span></div></div>
+<div class="form-group"><div class="range-group"><label for="brightness">Brightness</label><input type="range" id="brightness" min="0" max="255" value="128" oninput="updateRangeValue('brightness',this.value);changeSetting('Brightness',this.value)"><span class="range-value" id="brightnessValue">128</span></div></div>
+<div class="form-group"><div class="range-group"><label for="fadeAmount">Fade Amount</label><input type="range" id="fadeAmount" min="0" max="255" value="128" oninput="updateRangeValue('fadeAmount',this.value);changeSetting('Fade Amount',this.value)"><span class="range-value" id="fadeAmountValue">128</span></div></div>
+<div class="form-group"><div class="range-group"><label for="fps_variability">FPS Variability</label><input type="range" id="fps_variability" min="0" max="66" value="0" oninput="updateRangeValue('fps_variability',this.value);changeSetting('FPS Variability',this.value)"><span class="range-value" id="fps_variabilityValue">0</span></div></div>
+</div>
 
-        <div class="color-picker-item">
-          <label for="Color4">Color 4</label>
-          <div class="color-picker-wrapper">
-            <input type="color" id="Color4" name="Color4" value="#ffffff" onchange="updateColorPreview(4, this.value); changeColor4(this.value)">
-            <div class="color-preview" id="preview4" style="background-color: #ffffff;">#FFFFFF</div>
-          </div>
-          <div class="preset-colors">
-            <div class="preset-color-btn" style="background-color: #ff0000;" onclick="setColor(4, '#ff0000')" title="Red"></div>
-            <div class="preset-color-btn" style="background-color: #00ff00;" onclick="setColor(4, '#00ff00')" title="Green"></div>
-            <div class="preset-color-btn" style="background-color: #0000ff;" onclick="setColor(4, '#0000ff')" title="Blue"></div>
-            <div class="preset-color-btn" style="background-color: #ffff00;" onclick="setColor(4, '#ffff00')" title="Yellow"></div>
-            <div class="preset-color-btn" style="background-color: #ff00ff;" onclick="setColor(4, '#ff00ff')" title="Magenta"></div>
-            <div class="preset-color-btn" style="background-color: #00ffff;" onclick="setColor(4, '#00ffff')" title="Cyan"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="card">
+<h2>Twinkle Settings</h2>
+<div class="form-group"><div class="range-group"><label for="twinkleSpeed">Twinkle Speed</label><input type="range" id="twinkleSpeed" min="0" max="8" value="4" oninput="updateRangeValue('twinkleSpeed',this.value);changeSetting('Twinkle Speed',this.value)"><span class="range-value" id="twinkleSpeedValue">4</span></div></div>
+<div class="form-group"><div class="range-group"><label for="twinkleDensity">Twinkle Density</label><input type="range" id="twinkleDensity" min="0" max="8" value="4" oninput="updateRangeValue('twinkleDensity',this.value);changeSetting('Twinkle Density',this.value)"><span class="range-value" id="twinkleDensityValue">4</span></div></div>
+</div>
 
-    <div class="card">
-      <h2>Performance Settings</h2>
-      <div class="form-group">
-        <div class="range-group">
-          <label for="fps">FPS</label>
-          <input type="range" id="fps" name="fps" min="1" max="66" value="30" oninput="updateRangeValue('fps', this.value); changeFPS(this.value)">
-          <span class="range-value" id="fpsValue">30</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="range-group">
-          <label for="brightness">Brightness</label>
-          <input type="range" id="brightness" name="brightness" min="0" max="255" value="128" oninput="updateRangeValue('brightness', this.value); changeBrightness(this.value)">
-          <span class="range-value" id="brightnessValue">128</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="range-group">
-          <label for="fadeAmount">Fade Amount</label>
-          <input type="range" id="fadeAmount" name="fadeAmount" min="0" max="255" value="128" oninput="updateRangeValue('fadeAmount', this.value); changeFadeAmount(this.value)">
-          <span class="range-value" id="fadeAmountValue">128</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="range-group">
-          <label for="fps_variability">FPS Variability</label>
-          <input type="range" id="fps_variability" name="fps_variability" min="0" max="66" value="0" oninput="updateRangeValue('fps_variability', this.value); changeFPS_Variability(this.value)">
-          <span class="range-value" id="fps_variabilityValue">0</span>
-        </div>
-      </div>
-    </div>
+<div class="card">
+<h2>Ring Pattern Settings</h2>
+<p>Select ring patterns from Mode dropdown (modes 10-15)</p>
+<div class="form-group"><div class="range-group"><label for="ringSpeed">Ring Speed</label><input type="range" id="ringSpeed" min="1" max="30" value="5" oninput="updateRangeValue('ringSpeed',this.value);changeSetting('Ring Speed',this.value)"><span class="range-value" id="ringSpeedValue">5</span></div></div>
+<div class="form-group"><div class="range-group"><label for="ringIntensity">Ring Intensity</label><input type="range" id="ringIntensity" min="50" max="255" value="200" oninput="updateRangeValue('ringIntensity',this.value);changeSetting('Ring Intensity',this.value)"><span class="range-value" id="ringIntensityValue">200</span></div></div>
+<div class="form-group"><div class="range-group"><label for="treeHeight">Tree Height (inches)</label><input type="range" id="treeHeight" min="24" max="120" value="84" step="1" oninput="updateRangeValue('treeHeight',this.value);changeSetting('Tree Height',this.value)"><span class="range-value" id="treeHeightValue">84</span></div><p>Physical height of tree (84 inches = 7 feet)</p></div>
+<div class="form-group"><div class="range-group"><label for="treeTaperRatio">Tree Taper Ratio</label><input type="range" id="treeTaperRatio" min="10" max="100" value="30" step="1" oninput="updateRangeValue('treeTaperRatio',this.value);changeSetting('Tree Taper Ratio',this.value)"><span class="range-value" id="treeTaperRatioValue">30</span></div><p>Top diameter as % of bottom (30% = narrow top)</p></div>
+<div class="form-group"><div class="range-group"><label for="testRingNumber">Test Ring Number</label><input type="range" id="testRingNumber" min="0" max="50" value="20" step="1" oninput="updateRangeValue('testRingNumber',this.value);changeSetting('Test Ring Number',this.value)"><span class="range-value" id="testRingNumberValue">20</span></div><p>Ring to display in Single Ring Test mode</p></div>
+<div class="form-group"><div class="range-group"><label for="bottomRingLEDs">Bottom Ring LEDs</label><input type="range" id="bottomRingLEDs" min="20" max="150" value="75" step="1" oninput="updateRangeValue('bottomRingLEDs',this.value);changeSetting('Bottom Ring LEDs',this.value)"><span class="range-value" id="bottomRingLEDsValue">75</span></div><p>Target LEDs per ring in bottom zone (50-100 typical)</p></div>
+<div class="form-group"><div class="range-group"><label for="middleRingLEDs">Middle Ring LEDs</label><input type="range" id="middleRingLEDs" min="5" max="50" value="20" step="1" oninput="updateRangeValue('middleRingLEDs',this.value);changeSetting('Middle Ring LEDs',this.value)"><span class="range-value" id="middleRingLEDsValue">20</span></div><p>Target LEDs per ring in middle zone (~20 typical)</p></div>
+<div class="form-group"><div class="range-group"><label for="topRingLEDs">Top Ring LEDs</label><input type="range" id="topRingLEDs" min="5" max="50" value="15" step="1" oninput="updateRangeValue('topRingLEDs',this.value);changeSetting('Top Ring LEDs',this.value)"><span class="range-value" id="topRingLEDsValue">15</span></div><p>Target LEDs per ring in top zone (~15 typical)</p></div>
+<div class="form-group"><div class="range-group"><label for="topZoneHeight">Top Zone Height (%)</label><input type="range" id="topZoneHeight" min="10" max="50" value="25" step="1" oninput="updateRangeValue('topZoneHeight',this.value);changeSetting('Top Zone Height',this.value)"><span class="range-value" id="topZoneHeightValue">25</span></div><p>Height ratio for top zone (25% = top quarter of tree)</p></div>
+</div>
 
-    <div class="card">
-      <h2>Twinkle Settings</h2>
-      <div class="form-group">
-        <div class="range-group">
-          <label for="twinkleSpeed">Twinkle Speed</label>
-          <input type="range" id="twinkleSpeed" name="twinkleSpeed" min="0" max="8" value="4" oninput="updateRangeValue('twinkleSpeed', this.value); changeTwinkleSpeed(this.value)">
-          <span class="range-value" id="twinkleSpeedValue">4</span>
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="range-group">
-          <label for="twinkleDensity">Twinkle Density</label>
-          <input type="range" id="twinkleDensity" name="twinkleDensity" min="0" max="8" value="4" oninput="updateRangeValue('twinkleDensity', this.value); changeTwinkleDensity(this.value)">
-          <span class="range-value" id="twinkleDensityValue">4</span>
-        </div>
-      </div>
-    </div>
+<div class="card">
+<h2>Breathing Settings</h2>
+<div class="form-group"><div class="range-group"><label for="breathingRate">Breathing Rate</label><input type="range" id="breathingRate" min="1" max="100" value="30" step="1" oninput="updateRangeValue('breathingRate',this.value);changeSetting('Breathing Rate',this.value)"><span class="range-value" id="breathingRateValue">30</span></div><p>Speed of breathing cycle (higher = faster)</p></div>
+<div class="form-group"><div class="range-group"><label for="breathingVariability">Variability</label><input type="range" id="breathingVariability" min="0" max="50" value="10" step="1" oninput="updateRangeValue('breathingVariability',this.value);changeSetting('Breathing Variability',this.value)"><span class="range-value" id="breathingVariabilityValue">10</span></div><p>Random variation in breathing timing</p></div>
+<div class="form-group"><div class="range-group"><label for="breathHoldTime">Breath Hold Time</label><input type="range" id="breathHoldTime" min="0" max="100" value="20" step="1" oninput="updateRangeValue('breathHoldTime',this.value);changeSetting('Breath Hold Time',this.value)"><span class="range-value" id="breathHoldTimeValue">20</span></div><p>Time to hold at peak brightness (0 = no hold)</p></div>
+</div>
 
-    <div class="grid-2">
-      <div class="card">
-        <h2>Range Control</h2>
-        <div class="form-group">
-          <div class="form-row-2">
-            <div>
-              <label for="startRange">Start Range</label>
-              <input type="number" id="startRange" name="startRange" placeholder="Start">
-            </div>
-            <div>
-              <label for="endRange">End Range</label>
-              <input type="number" id="endRange" name="endRange" placeholder="End">
-            </div>
-          </div>
-          <button onclick="sendRange()" style="margin-top: 12px; width: 100%;">Apply Range</button>
-        </div>
-      </div>
+<div class="card">
+<h2>Aurora Borealis Settings</h2>
+<div class="form-group"><div class="range-group"><label for="auroraSpeed">Aurora Speed</label><input type="range" id="auroraSpeed" min="1" max="20" value="3" oninput="updateRangeValue('auroraSpeed',this.value);changeSetting('Aurora Speed',this.value)"><span class="range-value" id="auroraSpeedValue">3</span></div></div>
+<div class="form-group"><div class="range-group"><label for="auroraIntensity">Aurora Intensity</label><input type="range" id="auroraIntensity" min="50" max="255" value="200" oninput="updateRangeValue('auroraIntensity',this.value);changeSetting('Aurora Intensity',this.value)"><span class="range-value" id="auroraIntensityValue">200</span></div></div>
+<div class="form-group"><div class="range-group"><label for="auroraWaveCount">Wave Count</label><input type="range" id="auroraWaveCount" min="1" max="10" value="3" oninput="updateRangeValue('auroraWaveCount',this.value);changeSetting('Aurora Wave Count',this.value)"><span class="range-value" id="auroraWaveCountValue">3</span></div></div>
+<div class="form-group"><div class="range-group"><label for="auroraColorRange">Color Range</label><input type="range" id="auroraColorRange" min="20" max="120" value="60" oninput="updateRangeValue('auroraColorRange',this.value);changeSetting('Aurora Color Range',this.value)"><span class="range-value" id="auroraColorRangeValue">60</span></div></div>
+</div>
 
-      <div class="card">
-        <h2>Advanced Options</h2>
-        <div class="form-group">
-          <div class="checkbox-group">
-            <input type="checkbox" id="incgHueState" checked>
-            <label for="incgHueState">Enable gHue Increment</label>
-          </div>
-          <button onclick="sendIncgHueState()" style="margin-top: 8px; width: 100%;">Apply</button>
-        </div>
-        <div class="form-group">
-          <div class="checkbox-group">
-            <input type="checkbox" id="audioBrightness" checked>
-            <label for="audioBrightness">Audio Brightness</label>
-          </div>
-          <button onclick="sendAudioBrightnessState()" style="margin-top: 8px; width: 100%;">Apply</button>
-        </div>
-        <div class="form-group">
-          <div class="checkbox-group">
-            <input type="checkbox" id="coolLikeState" checked>
-            <label for="coolLikeState">Cool Like Incandescent</label>
-          </div>
-          <button onclick="sendCoolLikeState()" style="margin-top: 8px; width: 100%;">Apply</button>
-        </div>
-        <div class="form-group">
-          <div class="checkbox-group">
-            <input type="checkbox" id="autoBgState" checked>
-            <label for="autoBgState">Auto Background Color</label>
-          </div>
-          <button onclick="sendAutoBgState()" style="margin-top: 8px; width: 100%;">Apply</button>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="card">
+<h2>Audio Visualization Settings</h2>
+<p>Controls for Audio Amplitude (mode 18), FFT Equalizer (mode 19), and Audio Color Spectrum (mode 20)</p>
+<div class="form-group"><div class="range-group"><label for="audioMinAmplitude">Min Amplitude</label><input type="range" id="audioMinAmplitude" min="1" max="100" value="5" step="1" oninput="updateRangeValue('audioMinAmplitude',this.value);changeSetting('Audio Min Amplitude',this.value)"><span class="range-value" id="audioMinAmplitudeValue">5</span></div><p>Minimum threshold - lower = more sensitive</p></div>
+<div class="form-group"><div class="range-group"><label for="audioMaxAmplitude">Max Amplitude</label><input type="range" id="audioMaxAmplitude" min="100" max="5000" value="1500" step="50" oninput="updateRangeValue('audioMaxAmplitude',this.value);changeSetting('Audio Max Amplitude',this.value)"><span class="range-value" id="audioMaxAmplitudeValue">1500</span></div><p>Maximum threshold - lower = more sensitive</p></div>
+<div class="form-group"><div class="range-group"><label for="audioSmoothing">Smoothing (%)</label><input type="range" id="audioSmoothing" min="0" max="100" value="70" step="1" oninput="updateRangeValue('audioSmoothing',this.value);changeSetting('Audio Smoothing',this.value)"><span class="range-value" id="audioSmoothingValue">70</span></div><p>Smoothing factor (higher = smoother, less responsive)</p></div>
+<div class="form-group"><div class="range-group"><label for="audioColorSpeed">Color Speed</label><input type="range" id="audioColorSpeed" min="1" max="100" value="30" step="1" oninput="updateRangeValue('audioColorSpeed',this.value);changeSetting('Audio Color Speed',this.value)"><span class="range-value" id="audioColorSpeedValue">30</span></div><p>Color shift speed for Audio Color Spectrum mode (mode 20)</p></div>
+<div class="form-group"><div class="range-group"><label for="audioWaveSpeed">Wave Speed</label><input type="range" id="audioWaveSpeed" min="1" max="100" value="50" step="1" oninput="updateRangeValue('audioWaveSpeed',this.value);changeSetting('Audio Wave Speed',this.value)"><span class="range-value" id="audioWaveSpeedValue">50</span></div><p>Wave speed multiplier for Audio Color Spectrum mode (mode 20)</p></div>
+</div>
 
-  <script>
-    var socket;
-    
-    function updateStatus(connected) {
-        var indicator = document.getElementById('statusIndicator');
-        var statusText = document.getElementById('statusText');
-        if (connected) {
-            indicator.classList.add('connected');
-            statusText.textContent = 'Connected';
-        } else {
-            indicator.classList.remove('connected');
-            statusText.textContent = 'Disconnected';
-        }
-    }
+<div class="card">
+<h2>Auto Brightness Settings</h2>
+<p>Automatically adjust brightness based on audio amplitude for all modes. Works with the base brightness setting.</p>
+<div class="form-group"><div class="checkbox-group"><input type="checkbox" id="autoBrightnessEnabled"><label for="autoBrightnessEnabled">Enable Auto Brightness</label></div><button onclick="sendCheckbox('autoBrightnessEnabled','Auto Brightness Enabled')">Apply</button></div>
+<div class="form-group"><div class="range-group"><label for="autoBrightnessMinBrightness">Min Brightness</label><input type="range" id="autoBrightnessMinBrightness" min="0" max="255" value="50" step="1" oninput="updateRangeValue('autoBrightnessMinBrightness',this.value);changeSetting('Auto Brightness Min Brightness',this.value)"><span class="range-value" id="autoBrightnessMinBrightnessValue">50</span></div><p>Minimum brightness value (0-255) - never goes below this</p></div>
+<div class="form-group"><div class="range-group"><label for="autoBrightnessMaxBrightness">Max Brightness</label><input type="range" id="autoBrightnessMaxBrightness" min="0" max="255" value="255" step="1" oninput="updateRangeValue('autoBrightnessMaxBrightness',this.value);changeSetting('Auto Brightness Max Brightness',this.value)"><span class="range-value" id="autoBrightnessMaxBrightnessValue">255</span></div><p>Maximum brightness value (0-255) - never goes above this</p></div>
+<div class="form-group"><div class="range-group"><label for="autoBrightnessMinAmplitude">Min Amplitude Threshold</label><input type="range" id="autoBrightnessMinAmplitude" min="0" max="10000" value="10" step="10" oninput="updateRangeValue('autoBrightnessMinAmplitude',this.value);changeSetting('Auto Brightness Min Amplitude',this.value)"><span class="range-value" id="autoBrightnessMinAmplitudeValue">10</span></div><p>Amplitude value that triggers minimum brightness</p></div>
+<div class="form-group"><div class="range-group"><label for="autoBrightnessMaxAmplitude">Max Amplitude Threshold</label><input type="range" id="autoBrightnessMaxAmplitude" min="0" max="10000" value="1000" step="50" oninput="updateRangeValue('autoBrightnessMaxAmplitude',this.value);changeSetting('Auto Brightness Max Amplitude',this.value)"><span class="range-value" id="autoBrightnessMaxAmplitudeValue">1000</span></div><p>Amplitude value that triggers maximum brightness</p></div>
+</div>
 
-    function updateRangeValue(id, value) {
-        document.getElementById(id + 'Value').textContent = value;
-    }
-    
-    function initWebSocket() {
-        socket = new WebSocket('ws://' + window.location.hostname + '/ws_control');
-        socket.onopen = function(event) {
-            console.log('WebSocket connected');
-            updateStatus(true);
-        };
-        socket.onclose = function(event) {
-            console.log('WebSocket disconnected');
-            updateStatus(false);
-            setTimeout(initWebSocket, 2000);
-        };
-        socket.onerror = function(error) {
-            console.log('WebSocket error:', error);
-            updateStatus(false);
-        };
-        socket.onmessage = function(event) {
-          console.log("Received message:", event.data);
-          var message = JSON.parse(event.data);
-          console.log("Parsed message:", message);
-          switch(message.type) {
-              case 'Mode':
-                  mode = message.value;
-                  document.getElementById("mode").value = mode;
-                  break;
-              case 'Start Range':
-                  startRange = message.value;
-                  document.getElementById("startRange").value = startRange;
-                  break;
-              case 'End Range':
-                  endRange = message.value;
-                  document.getElementById("endRange").value = endRange;
-                  break;
-              case 'Palette':
-                  palette = message.value;
-                  document.getElementById("palette").value = palette;
-                  break;
-              case 'Increment gHue':
-                  gHueState = message.value;
-                  if (gHueState == 1) {
-                    document.getElementById("incgHueState").checked = true;
-                  } else {
-                    document.getElementById("incgHueState").checked = false;
-                  }
-                  break;
-              case 'Brightness Audio':
-                  audioBrightness = message.value;
-                  if (audioBrightness == 1) {
-                    document.getElementById("audioBrightness").checked = true;
-                  } else {
-                    document.getElementById("audioBrightness").checked = false;
-                  }
-                  break;
-              case 'Color 1':
-                  color1 = message.value;
-                  document.getElementById("Color1").value = color1;
-                  updateColorPreview(1, color1);
-                  break;
-              case 'Color 2':
-                  color2 = message.value;
-                  document.getElementById("Color2").value = color2;
-                  updateColorPreview(2, color2);
-                  break; 
-              case 'Color 3':
-                  color3 = message.value;
-                  document.getElementById("Color3").value = color3;
-                  updateColorPreview(3, color3);
-                  break; 
-              case 'Color 4':
-                  color4 = message.value;
-                  document.getElementById("Color4").value = color4;
-                  updateColorPreview(4, color4);
-                  break; 
-              case 'FPS':
-                  fps = message.value;
-                  document.getElementById("fps").value = fps;
-                  updateRangeValue('fps', fps);
-                  break;
-              case 'Fade Amount':
-                  fadeAmount = message.value;
-                  document.getElementById("fadeAmount").value = fadeAmount;
-                  updateRangeValue('fadeAmount', fadeAmount);
-                  break;
-              case 'Brightness':
-                  brightness = message.value;
-                  document.getElementById("brightness").value = brightness;
-                  updateRangeValue('brightness', brightness);
-                  break;
-              case 'FPS Variability':
-                  fps_variability = message.value;
-                  document.getElementById("fps_variability").value = fps_variability;
-                  updateRangeValue('fps_variability', fps_variability);
-                  break;
-              case 'Twinkle Speed':
-                  twinkleSpeed = message.value;
-                  document.getElementById("twinkleSpeed").value = twinkleSpeed;
-                  updateRangeValue('twinkleSpeed', twinkleSpeed);
-                  break;
-              case 'Twinkle Density':
-                  twinkleDensity = message.value;
-                  document.getElementById("twinkleDensity").value = twinkleDensity;
-                  updateRangeValue('twinkleDensity', twinkleDensity);
-                  break;
-              case 'Cool Like':
-                  coolLikeState = message.value;
-                  if (coolLikeState == 1) {
-                    document.getElementById("coolLikeState").checked = true;
-                  } else {
-                    document.getElementById("coolLikeState").checked = false;
-                  }
-                  break;
-              case 'Auto Bg':
-                  autoBgState = message.value;
-                  if (autoBgState == 1) {
-                    document.getElementById("autoBgState").checked = true;
-                  } else {
-                    document.getElementById("autoBgState").checked = false;
-                  }
-                  break;
-          }
-        };
-    }
+<div class="grid-2">
+<div class="card">
+<h2>Range Control</h2>
+<div class="form-group">
+<div class="form-row-2">
+<div><label for="startRange">Start Range</label><input type="number" id="startRange" placeholder="Start"></div>
+<div><label for="endRange">End Range</label><input type="number" id="endRange" placeholder="End"></div>
+</div>
+<button onclick="sendRange()">Apply Range</button>
+</div>
+</div>
 
+<div class="card">
+<h2>Advanced Options</h2>
+<div class="form-group"><div class="checkbox-group"><input type="checkbox" id="incgHueState" checked><label for="incgHueState">Enable gHue Increment</label></div><button onclick="sendCheckbox('incgHueState','Increment gHue')">Apply</button></div>
+<div class="form-group"><div class="checkbox-group"><input type="checkbox" id="audioBrightness"><label for="audioBrightness">Audio Brightness (Legacy)</label></div><button onclick="sendCheckbox('audioBrightness','Brightness Audio')">Apply</button></div>
+<p style="color:#666;font-size:0.85em;margin-top:-10px;margin-bottom:10px;">Note: Legacy audio brightness feature. Use Auto Brightness Settings above for amplitude-based brightness control.</p>
+<div class="form-group"><div class="checkbox-group"><input type="checkbox" id="coolLikeState" checked><label for="coolLikeState">Cool Like Incandescent</label></div><button onclick="sendCheckbox('coolLikeState','Cool Like')">Apply</button></div>
+<div class="form-group"><div class="checkbox-group"><input type="checkbox" id="autoBgState" checked><label for="autoBgState">Auto Background Color</label></div><button onclick="sendCheckbox('autoBgState','Auto Bg')">Apply</button></div>
+</div>
+</div>
+</div>
 
-    // Function to unpack the group string into an array of LED indices
-    function unpackGroup(input) {
-        const ranges = input.split(","); // Split by commas
-        let unpacked = [];
+<script>
+var socket;
+var msgHandlers={
+'Mode':(v)=>document.getElementById('mode').value=v,
+'Start Range':(v)=>document.getElementById('startRange').value=v,
+'End Range':(v)=>document.getElementById('endRange').value=v,
+'Palette':(v)=>document.getElementById('palette').value=v,
+'Increment gHue':(v)=>document.getElementById('incgHueState').checked=v==1,
+'Brightness Audio':(v)=>document.getElementById('audioBrightness').checked=v==1,
+'Color 1':(v)=>{document.getElementById('Color1').value=v;updateColorPreview(1,v);},
+'Color 2':(v)=>{document.getElementById('Color2').value=v;updateColorPreview(2,v);},
+'Color 3':(v)=>{document.getElementById('Color3').value=v;updateColorPreview(3,v);},
+'Color 4':(v)=>{document.getElementById('Color4').value=v;updateColorPreview(4,v);},
+'FPS':(v)=>{document.getElementById('fps').value=v;updateRangeValue('fps',v);},
+'Fade Amount':(v)=>{document.getElementById('fadeAmount').value=v;updateRangeValue('fadeAmount',v);},
+'Brightness':(v)=>{document.getElementById('brightness').value=v;updateRangeValue('brightness',v);},
+'FPS Variability':(v)=>{document.getElementById('fps_variability').value=v;updateRangeValue('fps_variability',v);},
+'Twinkle Speed':(v)=>{document.getElementById('twinkleSpeed').value=v;updateRangeValue('twinkleSpeed',v);},
+'Twinkle Density':(v)=>{document.getElementById('twinkleDensity').value=v;updateRangeValue('twinkleDensity',v);},
+'Aurora Speed':(v)=>{document.getElementById('auroraSpeed').value=v;updateRangeValue('auroraSpeed',v);},
+'Aurora Intensity':(v)=>{document.getElementById('auroraIntensity').value=v;updateRangeValue('auroraIntensity',v);},
+'Aurora Wave Count':(v)=>{document.getElementById('auroraWaveCount').value=v;updateRangeValue('auroraWaveCount',v);},
+'Aurora Color Range':(v)=>{document.getElementById('auroraColorRange').value=v;updateRangeValue('auroraColorRange',v);},
+'Ring Speed':(v)=>{document.getElementById('ringSpeed').value=v;updateRangeValue('ringSpeed',v);},
+'Ring Intensity':(v)=>{document.getElementById('ringIntensity').value=v;updateRangeValue('ringIntensity',v);},
+'Tree Height':(v)=>{document.getElementById('treeHeight').value=v;updateRangeValue('treeHeight',v);},
+'Tree Taper Ratio':(v)=>{document.getElementById('treeTaperRatio').value=v;updateRangeValue('treeTaperRatio',v);},
+'Test Ring Number':(v)=>{document.getElementById('testRingNumber').value=v;updateRangeValue('testRingNumber',v);},
+'Bottom Ring LEDs':(v)=>{document.getElementById('bottomRingLEDs').value=v;updateRangeValue('bottomRingLEDs',v);},
+'Middle Ring LEDs':(v)=>{document.getElementById('middleRingLEDs').value=v;updateRangeValue('middleRingLEDs',v);},
+'Top Ring LEDs':(v)=>{document.getElementById('topRingLEDs').value=v;updateRangeValue('topRingLEDs',v);},
+'Top Zone Height':(v)=>{document.getElementById('topZoneHeight').value=v;updateRangeValue('topZoneHeight',v);},
+'Breathing Rate':(v)=>{document.getElementById('breathingRate').value=v;updateRangeValue('breathingRate',v);},
+'Breathing Variability':(v)=>{document.getElementById('breathingVariability').value=v;updateRangeValue('breathingVariability',v);},
+'Breath Hold Time':(v)=>{document.getElementById('breathHoldTime').value=v;updateRangeValue('breathHoldTime',v);},
+'Audio Min Amplitude':(v)=>{document.getElementById('audioMinAmplitude').value=v;updateRangeValue('audioMinAmplitude',v);},
+'Audio Max Amplitude':(v)=>{document.getElementById('audioMaxAmplitude').value=v;updateRangeValue('audioMaxAmplitude',v);},
+'Audio Smoothing':(v)=>{document.getElementById('audioSmoothing').value=v;updateRangeValue('audioSmoothing',v);},
+'Audio Color Speed':(v)=>{document.getElementById('audioColorSpeed').value=v;updateRangeValue('audioColorSpeed',v);},
+'Audio Wave Speed':(v)=>{document.getElementById('audioWaveSpeed').value=v;updateRangeValue('audioWaveSpeed',v);},
+'Auto Brightness Enabled':(v)=>document.getElementById('autoBrightnessEnabled').checked=(v=='true'||v==1||v===true),
+'Auto Brightness Min Brightness':(v)=>{document.getElementById('autoBrightnessMinBrightness').value=v;updateRangeValue('autoBrightnessMinBrightness',v);},
+'Auto Brightness Max Brightness':(v)=>{document.getElementById('autoBrightnessMaxBrightness').value=v;updateRangeValue('autoBrightnessMaxBrightness',v);},
+'Auto Brightness Min Amplitude':(v)=>{document.getElementById('autoBrightnessMinAmplitude').value=v;updateRangeValue('autoBrightnessMinAmplitude',v);},
+'Auto Brightness Max Amplitude':(v)=>{document.getElementById('autoBrightnessMaxAmplitude').value=v;updateRangeValue('autoBrightnessMaxAmplitude',v);},
+'Cool Like':(v)=>document.getElementById('coolLikeState').checked=v==1,
+'Auto Bg':(v)=>document.getElementById('autoBgState').checked=v==1,
+'Mic RMS':(v)=>document.getElementById('micRMSValue').textContent=parseFloat(v).toFixed(2)
+};
 
-        ranges.forEach(range => {
-            range = range.trim(); // Remove whitespace
-            if (range.includes("-")) {
-                // Handle range (e.g., "0-50")
-                const [start, end] = range.split("-").map(Number);
-                for (let i = start; i <= end; i++) {
-                    unpacked.push(i);
-                }
-            } else {
-                // Handle single LED (e.g., "55")
-                unpacked.push(Number(range));
-            }
-        });
-
-        return unpacked;
-    }
-
-    // Function to send the group to the ESP32
-    function sendGroup(number) {
-        // get element id by number group0Input, group1Input, etc.
-        const input = document.getElementById("group" + number + "Input").value;
-        const unpackedGroup = unpackGroup(input);
-
-        // concatonate the group with the number like so: "Group0"
-        const groupString = "Group" + number;
-
-        sendMessage(groupString, unpackedGroup);
-        console.log("Sent group:", unpackedGroup);
-    }
-
-    function sendMessage(type, value) {
-        var message = JSON.stringify({type: type, value: value});
-        socket.send(message);
-    }
-
-    window.onload = function() {
-        initWebSocket();
-        // Initialize color previews with default values
-        var color1 = document.getElementById("Color1").value;
-        var color2 = document.getElementById("Color2").value;
-        var color3 = document.getElementById("Color3").value;
-        var color4 = document.getElementById("Color4").value;
-        updateColorPreview(1, color1);
-        updateColorPreview(2, color2);
-        updateColorPreview(3, color3);
-        updateColorPreview(4, color4);
-        
-        // Initialize range values
-        updateRangeValue('fps', document.getElementById("fps").value);
-        updateRangeValue('brightness', document.getElementById("brightness").value);
-        updateRangeValue('fadeAmount', document.getElementById("fadeAmount").value);
-        updateRangeValue('fps_variability', document.getElementById("fps_variability").value);
-        updateRangeValue('twinkleSpeed', document.getElementById("twinkleSpeed").value);
-        updateRangeValue('twinkleDensity', document.getElementById("twinkleDensity").value);
-    };
-
-    function sendMode() {
-      var mode = document.getElementById("mode").value;
-      sendMessage("Mode", mode);
-    }
-
-    function sendRange() {
-      var startRange = document.getElementById("startRange").value;
-      var endRange = document.getElementById("endRange").value;
-      sendMessage("Start Range", startRange);
-      // delay to ensure startRange is sent first
-        setTimeout(function() {
-            sendMessage("End Range", endRange);
-        }, 100);
-    }
-    
-    function sendIncgHueState() {
-      var incgHueState = document.getElementById("incgHueState").checked;
-      sendMessage("Increment gHue", incgHueState);
-    }
-
-    function sendAudioBrightnessState() {
-        var audioBrightness = document.getElementById("audioBrightness").checked;
-        sendMessage("Brightness Audio", audioBrightness);
-    }
-    
-    function sendPalette() {
-      var palette = document.getElementById("palette").value;
-      sendMessage("Palette", palette);
-    }
-
-    function hexToRgb(hex) {
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : null;
-    }
-
-    function getLuminance(hex) {
-        var rgb = hexToRgb(hex);
-        if (!rgb) return 0;
-        return (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-    }
-
-    function updateColorPreview(colorNum, hexValue) {
-        var preview = document.getElementById("preview" + colorNum);
-        var hexUpper = hexValue.toUpperCase();
-        preview.style.backgroundColor = hexValue;
-        preview.textContent = hexUpper;
-        
-        // Adjust text color based on background brightness
-        if (getLuminance(hexValue) > 0.5) {
-            preview.classList.remove("dark-text");
-        } else {
-            preview.classList.add("dark-text");
-        }
-    }
-
-    function setColor(colorNum, hexValue) {
-        var colorInput = document.getElementById("Color" + colorNum);
-        colorInput.value = hexValue;
-        updateColorPreview(colorNum, hexValue);
-        
-        switch(colorNum) {
-            case 1:
-                changeColor1(hexValue);
-                break;
-            case 2:
-                changeColor2(hexValue);
-                break;
-            case 3:
-                changeColor3(hexValue);
-                break;
-            case 4:
-                changeColor4(hexValue);
-                break;
-        }
-    }
-
-    function changeColor1(value) {
-        sendMessage("Color 1", value);
-    }
-
-    function changeColor2(value) {
-        sendMessage("Color 2", value);
-    }
-
-    function changeColor3(value) {
-        sendMessage("Color 3", value);
-    }
-
-    function changeColor4(value) {
-        sendMessage("Color 4", value);
-    }
-
-    function changeFPS(value) {
-        sendMessage("FPS", value);
-    }
-
-    function changeBrightness(value) {
-        sendMessage("Brightness", value);
-    }
-
-    function changeFadeAmount(value) {
-        sendMessage("Fade Amount", value);
-    }
-
-    function changeFPS_Variability(value) {
-        sendMessage("FPS Variability", value);
-    }
-
-    function changeTwinkleSpeed(value) {
-        sendMessage("Twinkle Speed", value);
-    }
-
-    function changeTwinkleDensity(value) {
-        sendMessage("Twinkle Density", value);
-    }
-    
-    function sendCoolLikeState() {
-      var coolLikeState = document.getElementById("coolLikeState").checked;
-      sendMessage("Cool Like", coolLikeState);
-    }
-    
-    function sendAutoBgState() {
-      var autoBgState = document.getElementById("autoBgState").checked;
-      sendMessage("Auto Bg", autoBgState);
-    }
-  </script>
+function updateStatus(c){var i=document.getElementById('statusIndicator'),s=document.getElementById('statusText');if(c){i.classList.add('connected');s.textContent='Connected';}else{i.classList.remove('connected');s.textContent='Disconnected';}}
+function updateRangeValue(id,v){document.getElementById(id+'Value').textContent=v;}
+function changeSetting(type,v){sendMessage(type,v);}
+function changeColor(n,v){sendMessage('Color '+n,v);}
+function sendMessage(type,value){socket.send(JSON.stringify({type:type,value:value}));}
+function initWebSocket(){
+socket=new WebSocket('ws://'+window.location.hostname+'/ws_control');
+socket.onopen=function(){console.log('WebSocket connected');updateStatus(true);};
+socket.onclose=function(){console.log('WebSocket disconnected');updateStatus(false);setTimeout(initWebSocket,2000);};
+socket.onerror=function(e){console.log('WebSocket error:',e);updateStatus(false);};
+socket.onmessage=function(e){var m=JSON.parse(e.data);if(msgHandlers[m.type])msgHandlers[m.type](m.value);};
+}
+function unpackGroup(input){const r=input.split(',');let u=[];r.forEach(x=>{x=x.trim();if(x.includes('-')){const[s,e]=x.split('-').map(Number);for(let i=s;i<=e;i++)u.push(i);}else u.push(Number(x));});return u;}
+function sendGroup(n){const i=document.getElementById('group'+n+'Input').value;sendMessage('Group'+n,unpackGroup(i));}
+function sendMode(){sendMessage('Mode',document.getElementById('mode').value);}
+function sendRange(){sendMessage('Start Range',document.getElementById('startRange').value);setTimeout(()=>sendMessage('End Range',document.getElementById('endRange').value),100);}
+function sendPalette(){sendMessage('Palette',document.getElementById('palette').value);}
+function sendCheckbox(id,type){
+  const value = document.getElementById(id).checked;
+  if (type === 'Auto Brightness Enabled') {
+    sendMessage(type, value ? 'true' : 'false');
+  } else {
+    sendMessage(type, value);
+  }
+}
+function hexToRgb(h){var r=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);return r?{r:parseInt(r[1],16),g:parseInt(r[2],16),b:parseInt(r[3],16)}:null;}
+function getLuminance(h){var r=hexToRgb(h);return r?(0.299*r.r+0.587*r.g+0.114*r.b)/255:0;}
+function updateColorPreview(n,h){var p=document.getElementById('preview'+n);p.style.backgroundColor=h;p.textContent=h.toUpperCase();p.classList.toggle('dark-text',getLuminance(h)<=0.5);}
+function setColor(n,h){document.getElementById('Color'+n).value=h;updateColorPreview(n,h);changeColor(n,h);}
+window.onload=function(){
+initWebSocket();
+for(let i=1;i<=4;i++)updateColorPreview(i,document.getElementById('Color'+i).value);
+['fps','brightness','fadeAmount','fps_variability','twinkleSpeed','twinkleDensity','auroraSpeed','auroraIntensity','auroraWaveCount','auroraColorRange','ringSpeed','ringIntensity','treeHeight','treeTaperRatio','testRingNumber','bottomRingLEDs','middleRingLEDs','topRingLEDs','topZoneHeight','breathingRate','breathingVariability','breathHoldTime','audioMinAmplitude','audioMaxAmplitude','audioSmoothing','audioColorSpeed','audioWaveSpeed','autoBrightnessMinBrightness','autoBrightnessMaxBrightness','autoBrightnessMinAmplitude','autoBrightnessMaxAmplitude'].forEach(id=>updateRangeValue(id,document.getElementById(id).value));
+};
+</script>
 </body>
-
 </html>
