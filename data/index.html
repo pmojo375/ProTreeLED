@@ -30,6 +30,8 @@ button:active{transform:scale(0.98);}
 .color-picker-section h2{color:#667eea;margin-bottom:15px;font-size:1.3em;}
 .color-picker-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;}
 .color-picker-item{display:flex;flex-direction:column;gap:10px;}
+.color-picker-item[data-modes]{display:none;}
+.color-picker-item[data-modes].active{display:flex;}
 .color-picker-wrapper{display:flex;gap:10px;align-items:center;}
 .color-picker-wrapper input[type="color"]{width:60px;height:40px;border:none;border-radius:5px;cursor:pointer;}
 .color-preview{padding:8px 12px;border-radius:5px;font-weight:500;min-width:100px;text-align:center;color:#333;border:1px solid #ddd;}
@@ -48,6 +50,8 @@ input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:5px;width:1
 .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;}
 .card p{color:#666;font-size:0.9em;margin-top:5px;}
 #micRMSValue{font-size:1.5em;font-weight:bold;color:#667eea;}
+.mode-specific{display:none;}
+.mode-specific.active{display:block;}
 </style>
 </head>
 <body>
@@ -62,7 +66,7 @@ input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:5px;width:1
 <div class="form-group">
 <label for="mode">Function Mode</label>
 <div class="form-row">
-<select id="mode">
+<select id="mode" onchange="updateModeVisibility(this.value)">
 <option value="0">Normal</option><option value="1">Color Waves</option><option value="2">Twinkling Stars</option><option value="3">Candy Cane</option><option value="4">Rising Sparkles</option><option value="5">Twinkle Fox</option><option value="6">Fire</option><option value="7">Set Range</option><option value="8">Group Test</option><option value="9">Aurora Borealis</option><option value="10">Spiral Rings</option><option value="11">Expanding Rings</option><option value="12">Chasing Rings</option><option value="13">Gradient Rings</option><option value="14">Twinkling Rings</option><option value="15">Wave Rings</option><option value="16">Single Ring Test</option><option value="17">Breathing</option><option value="18">Audio Amplitude</option><option value="19">FFT Equalizer</option><option value="20">Audio Color Spectrum</option>
 </select>
 <button onclick="sendMode()">Apply</button>
@@ -78,7 +82,7 @@ input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:5px;width:1
 </div>
 </div>
 
-<div class="card">
+<div class="card mode-specific" data-modes="8">
 <h2>LED Groups</h2>
 <div class="led-groups">
 <div class="led-group-item"><label for="group1Input">Group 1</label><div class="form-row"><input type="text" id="group1Input" placeholder="e.g., 0-50, 55, 60-65"><button onclick="sendGroup(1)">Send</button></div></div>
@@ -89,7 +93,7 @@ input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:5px;width:1
 </div>
 </div>
 
-<div class="card">
+<div class="card mode-specific" data-modes="1,5,6,10,11,12,13,14">
 <h2>Color Palette</h2>
 <div class="form-group">
 <label for="palette">Palette Selection</label>
@@ -102,13 +106,13 @@ input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:5px;width:1
 </div>
 </div>
 
-<div class="color-picker-section">
+<div class="color-picker-section mode-specific" data-modes="0,2,3,18">
 <h2>Color Selection</h2>
 <div class="color-picker-group">
-<div class="color-picker-item"><label for="Color1">Color 1</label><div class="color-picker-wrapper"><input type="color" id="Color1" value="#ff0000" onchange="updateColorPreview(1,this.value);changeColor(1,this.value)"><div class="color-preview" id="preview1">#FF0000</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(1,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(1,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(1,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(1,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(1,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(1,'#00ffff')" title="Cyan"></div></div></div>
-<div class="color-picker-item"><label for="Color2">Color 2</label><div class="color-picker-wrapper"><input type="color" id="Color2" value="#00ff00" onchange="updateColorPreview(2,this.value);changeColor(2,this.value)"><div class="color-preview" id="preview2">#00FF00</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(2,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(2,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(2,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(2,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(2,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(2,'#00ffff')" title="Cyan"></div></div></div>
-<div class="color-picker-item"><label for="Color3">Color 3</label><div class="color-picker-wrapper"><input type="color" id="Color3" value="#0000ff" onchange="updateColorPreview(3,this.value);changeColor(3,this.value)"><div class="color-preview" id="preview3">#0000FF</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(3,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(3,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(3,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(3,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(3,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(3,'#00ffff')" title="Cyan"></div></div></div>
-<div class="color-picker-item"><label for="Color4">Color 4</label><div class="color-picker-wrapper"><input type="color" id="Color4" value="#ffffff" onchange="updateColorPreview(4,this.value);changeColor(4,this.value)"><div class="color-preview" id="preview4">#FFFFFF</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(4,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(4,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(4,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(4,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(4,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(4,'#00ffff')" title="Cyan"></div></div></div>
+<div class="color-picker-item" data-modes="0,2,3,18"><label for="Color1">Color 1</label><div class="color-picker-wrapper"><input type="color" id="Color1" value="#ff0000" onchange="updateColorPreview(1,this.value);changeColor(1,this.value)"><div class="color-preview" id="preview1">#FF0000</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(1,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(1,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(1,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(1,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(1,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(1,'#00ffff')" title="Cyan"></div></div></div>
+<div class="color-picker-item" data-modes="0,3,18"><label for="Color2">Color 2</label><div class="color-picker-wrapper"><input type="color" id="Color2" value="#00ff00" onchange="updateColorPreview(2,this.value);changeColor(2,this.value)"><div class="color-preview" id="preview2">#00FF00</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(2,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(2,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(2,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(2,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(2,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(2,'#00ffff')" title="Cyan"></div></div></div>
+<div class="color-picker-item" data-modes="0,18"><label for="Color3">Color 3</label><div class="color-picker-wrapper"><input type="color" id="Color3" value="#0000ff" onchange="updateColorPreview(3,this.value);changeColor(3,this.value)"><div class="color-preview" id="preview3">#0000FF</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(3,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(3,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(3,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(3,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(3,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(3,'#00ffff')" title="Cyan"></div></div></div>
+<div class="color-picker-item" data-modes="0"><label for="Color4">Color 4</label><div class="color-picker-wrapper"><input type="color" id="Color4" value="#ffffff" onchange="updateColorPreview(4,this.value);changeColor(4,this.value)"><div class="color-preview" id="preview4">#FFFFFF</div></div><div class="preset-colors"><div class="preset-color-btn" onclick="setColor(4,'#ff0000')" title="Red"></div><div class="preset-color-btn" onclick="setColor(4,'#00ff00')" title="Green"></div><div class="preset-color-btn" onclick="setColor(4,'#0000ff')" title="Blue"></div><div class="preset-color-btn" onclick="setColor(4,'#ffff00')" title="Yellow"></div><div class="preset-color-btn" onclick="setColor(4,'#ff00ff')" title="Magenta"></div><div class="preset-color-btn" onclick="setColor(4,'#00ffff')" title="Cyan"></div></div></div>
 </div>
 </div>
 
@@ -116,38 +120,37 @@ input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:5px;width:1
 <h2>Performance Settings</h2>
 <div class="form-group"><div class="range-group"><label for="fps">FPS</label><input type="range" id="fps" min="1" max="66" value="30" oninput="updateRangeValue('fps',this.value);changeSetting('FPS',this.value)"><span class="range-value" id="fpsValue">30</span></div></div>
 <div class="form-group"><div class="range-group"><label for="brightness">Brightness</label><input type="range" id="brightness" min="0" max="255" value="128" oninput="updateRangeValue('brightness',this.value);changeSetting('Brightness',this.value)"><span class="range-value" id="brightnessValue">128</span></div></div>
-<div class="form-group"><div class="range-group"><label for="fadeAmount">Fade Amount</label><input type="range" id="fadeAmount" min="0" max="255" value="128" oninput="updateRangeValue('fadeAmount',this.value);changeSetting('Fade Amount',this.value)"><span class="range-value" id="fadeAmountValue">128</span></div></div>
+<div class="form-group mode-specific" data-modes="0"><div class="range-group"><label for="fadeAmount">Fade Amount</label><input type="range" id="fadeAmount" min="0" max="255" value="128" oninput="updateRangeValue('fadeAmount',this.value);changeSetting('Fade Amount',this.value)"><span class="range-value" id="fadeAmountValue">128</span></div></div>
 <div class="form-group"><div class="range-group"><label for="fps_variability">FPS Variability</label><input type="range" id="fps_variability" min="0" max="66" value="0" oninput="updateRangeValue('fps_variability',this.value);changeSetting('FPS Variability',this.value)"><span class="range-value" id="fps_variabilityValue">0</span></div></div>
 </div>
 
-<div class="card">
+<div class="card mode-specific" data-modes="5">
 <h2>Twinkle Settings</h2>
 <div class="form-group"><div class="range-group"><label for="twinkleSpeed">Twinkle Speed</label><input type="range" id="twinkleSpeed" min="0" max="8" value="4" oninput="updateRangeValue('twinkleSpeed',this.value);changeSetting('Twinkle Speed',this.value)"><span class="range-value" id="twinkleSpeedValue">4</span></div></div>
 <div class="form-group"><div class="range-group"><label for="twinkleDensity">Twinkle Density</label><input type="range" id="twinkleDensity" min="0" max="8" value="4" oninput="updateRangeValue('twinkleDensity',this.value);changeSetting('Twinkle Density',this.value)"><span class="range-value" id="twinkleDensityValue">4</span></div></div>
 </div>
 
-<div class="card">
+<div class="card mode-specific" data-modes="10,11,12,13,14,15,16,17">
 <h2>Ring Pattern Settings</h2>
-<p>Select ring patterns from Mode dropdown (modes 10-15)</p>
 <div class="form-group"><div class="range-group"><label for="ringSpeed">Ring Speed</label><input type="range" id="ringSpeed" min="1" max="30" value="5" oninput="updateRangeValue('ringSpeed',this.value);changeSetting('Ring Speed',this.value)"><span class="range-value" id="ringSpeedValue">5</span></div></div>
 <div class="form-group"><div class="range-group"><label for="ringIntensity">Ring Intensity</label><input type="range" id="ringIntensity" min="50" max="255" value="200" oninput="updateRangeValue('ringIntensity',this.value);changeSetting('Ring Intensity',this.value)"><span class="range-value" id="ringIntensityValue">200</span></div></div>
 <div class="form-group"><div class="range-group"><label for="treeHeight">Tree Height (inches)</label><input type="range" id="treeHeight" min="24" max="120" value="84" step="1" oninput="updateRangeValue('treeHeight',this.value);changeSetting('Tree Height',this.value)"><span class="range-value" id="treeHeightValue">84</span></div><p>Physical height of tree (84 inches = 7 feet)</p></div>
 <div class="form-group"><div class="range-group"><label for="treeTaperRatio">Tree Taper Ratio</label><input type="range" id="treeTaperRatio" min="10" max="100" value="30" step="1" oninput="updateRangeValue('treeTaperRatio',this.value);changeSetting('Tree Taper Ratio',this.value)"><span class="range-value" id="treeTaperRatioValue">30</span></div><p>Top diameter as % of bottom (30% = narrow top)</p></div>
-<div class="form-group"><div class="range-group"><label for="testRingNumber">Test Ring Number</label><input type="range" id="testRingNumber" min="0" max="50" value="20" step="1" oninput="updateRangeValue('testRingNumber',this.value);changeSetting('Test Ring Number',this.value)"><span class="range-value" id="testRingNumberValue">20</span></div><p>Ring to display in Single Ring Test mode</p></div>
+<div class="form-group mode-specific" data-modes="16"><div class="range-group"><label for="testRingNumber">Test Ring Number</label><input type="range" id="testRingNumber" min="0" max="50" value="20" step="1" oninput="updateRangeValue('testRingNumber',this.value);changeSetting('Test Ring Number',this.value)"><span class="range-value" id="testRingNumberValue">20</span></div><p>Ring to display in Single Ring Test mode</p></div>
 <div class="form-group"><div class="range-group"><label for="bottomRingLEDs">Bottom Ring LEDs</label><input type="range" id="bottomRingLEDs" min="20" max="150" value="75" step="1" oninput="updateRangeValue('bottomRingLEDs',this.value);changeSetting('Bottom Ring LEDs',this.value)"><span class="range-value" id="bottomRingLEDsValue">75</span></div><p>Target LEDs per ring in bottom zone (50-100 typical)</p></div>
 <div class="form-group"><div class="range-group"><label for="middleRingLEDs">Middle Ring LEDs</label><input type="range" id="middleRingLEDs" min="5" max="50" value="20" step="1" oninput="updateRangeValue('middleRingLEDs',this.value);changeSetting('Middle Ring LEDs',this.value)"><span class="range-value" id="middleRingLEDsValue">20</span></div><p>Target LEDs per ring in middle zone (~20 typical)</p></div>
 <div class="form-group"><div class="range-group"><label for="topRingLEDs">Top Ring LEDs</label><input type="range" id="topRingLEDs" min="5" max="50" value="15" step="1" oninput="updateRangeValue('topRingLEDs',this.value);changeSetting('Top Ring LEDs',this.value)"><span class="range-value" id="topRingLEDsValue">15</span></div><p>Target LEDs per ring in top zone (~15 typical)</p></div>
 <div class="form-group"><div class="range-group"><label for="topZoneHeight">Top Zone Height (%)</label><input type="range" id="topZoneHeight" min="10" max="50" value="25" step="1" oninput="updateRangeValue('topZoneHeight',this.value);changeSetting('Top Zone Height',this.value)"><span class="range-value" id="topZoneHeightValue">25</span></div><p>Height ratio for top zone (25% = top quarter of tree)</p></div>
 </div>
 
-<div class="card">
+<div class="card mode-specific" data-modes="17">
 <h2>Breathing Settings</h2>
 <div class="form-group"><div class="range-group"><label for="breathingRate">Breathing Rate</label><input type="range" id="breathingRate" min="1" max="100" value="30" step="1" oninput="updateRangeValue('breathingRate',this.value);changeSetting('Breathing Rate',this.value)"><span class="range-value" id="breathingRateValue">30</span></div><p>Speed of breathing cycle (higher = faster)</p></div>
 <div class="form-group"><div class="range-group"><label for="breathingVariability">Variability</label><input type="range" id="breathingVariability" min="0" max="50" value="10" step="1" oninput="updateRangeValue('breathingVariability',this.value);changeSetting('Breathing Variability',this.value)"><span class="range-value" id="breathingVariabilityValue">10</span></div><p>Random variation in breathing timing</p></div>
 <div class="form-group"><div class="range-group"><label for="breathHoldTime">Breath Hold Time</label><input type="range" id="breathHoldTime" min="0" max="100" value="20" step="1" oninput="updateRangeValue('breathHoldTime',this.value);changeSetting('Breath Hold Time',this.value)"><span class="range-value" id="breathHoldTimeValue">20</span></div><p>Time to hold at peak brightness (0 = no hold)</p></div>
 </div>
 
-<div class="card">
+<div class="card mode-specific" data-modes="9">
 <h2>Aurora Borealis Settings</h2>
 <div class="form-group"><div class="range-group"><label for="auroraSpeed">Aurora Speed</label><input type="range" id="auroraSpeed" min="1" max="20" value="3" oninput="updateRangeValue('auroraSpeed',this.value);changeSetting('Aurora Speed',this.value)"><span class="range-value" id="auroraSpeedValue">3</span></div></div>
 <div class="form-group"><div class="range-group"><label for="auroraIntensity">Aurora Intensity</label><input type="range" id="auroraIntensity" min="50" max="255" value="200" oninput="updateRangeValue('auroraIntensity',this.value);changeSetting('Aurora Intensity',this.value)"><span class="range-value" id="auroraIntensityValue">200</span></div></div>
@@ -155,14 +158,13 @@ input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:5px;width:1
 <div class="form-group"><div class="range-group"><label for="auroraColorRange">Color Range</label><input type="range" id="auroraColorRange" min="20" max="120" value="60" oninput="updateRangeValue('auroraColorRange',this.value);changeSetting('Aurora Color Range',this.value)"><span class="range-value" id="auroraColorRangeValue">60</span></div></div>
 </div>
 
-<div class="card">
+<div class="card mode-specific" data-modes="18,19,20">
 <h2>Audio Visualization Settings</h2>
-<p>Controls for Audio Amplitude (mode 18), FFT Equalizer (mode 19), and Audio Color Spectrum (mode 20)</p>
 <div class="form-group"><div class="range-group"><label for="audioMinAmplitude">Min Amplitude</label><input type="range" id="audioMinAmplitude" min="1" max="100" value="5" step="1" oninput="updateRangeValue('audioMinAmplitude',this.value);changeSetting('Audio Min Amplitude',this.value)"><span class="range-value" id="audioMinAmplitudeValue">5</span></div><p>Minimum threshold - lower = more sensitive</p></div>
 <div class="form-group"><div class="range-group"><label for="audioMaxAmplitude">Max Amplitude</label><input type="range" id="audioMaxAmplitude" min="100" max="5000" value="1500" step="50" oninput="updateRangeValue('audioMaxAmplitude',this.value);changeSetting('Audio Max Amplitude',this.value)"><span class="range-value" id="audioMaxAmplitudeValue">1500</span></div><p>Maximum threshold - lower = more sensitive</p></div>
 <div class="form-group"><div class="range-group"><label for="audioSmoothing">Smoothing (%)</label><input type="range" id="audioSmoothing" min="0" max="100" value="70" step="1" oninput="updateRangeValue('audioSmoothing',this.value);changeSetting('Audio Smoothing',this.value)"><span class="range-value" id="audioSmoothingValue">70</span></div><p>Smoothing factor (higher = smoother, less responsive)</p></div>
-<div class="form-group"><div class="range-group"><label for="audioColorSpeed">Color Speed</label><input type="range" id="audioColorSpeed" min="1" max="100" value="30" step="1" oninput="updateRangeValue('audioColorSpeed',this.value);changeSetting('Audio Color Speed',this.value)"><span class="range-value" id="audioColorSpeedValue">30</span></div><p>Color shift speed for Audio Color Spectrum mode (mode 20)</p></div>
-<div class="form-group"><div class="range-group"><label for="audioWaveSpeed">Wave Speed</label><input type="range" id="audioWaveSpeed" min="1" max="100" value="50" step="1" oninput="updateRangeValue('audioWaveSpeed',this.value);changeSetting('Audio Wave Speed',this.value)"><span class="range-value" id="audioWaveSpeedValue">50</span></div><p>Wave speed multiplier for Audio Color Spectrum mode (mode 20)</p></div>
+<div class="form-group mode-specific" data-modes="20"><div class="range-group"><label for="audioColorSpeed">Color Speed</label><input type="range" id="audioColorSpeed" min="1" max="100" value="30" step="1" oninput="updateRangeValue('audioColorSpeed',this.value);changeSetting('Audio Color Speed',this.value)"><span class="range-value" id="audioColorSpeedValue">30</span></div><p>Color shift speed for Audio Color Spectrum mode (mode 20)</p></div>
+<div class="form-group mode-specific" data-modes="20"><div class="range-group"><label for="audioWaveSpeed">Wave Speed</label><input type="range" id="audioWaveSpeed" min="1" max="100" value="50" step="1" oninput="updateRangeValue('audioWaveSpeed',this.value);changeSetting('Audio Wave Speed',this.value)"><span class="range-value" id="audioWaveSpeedValue">50</span></div><p>Wave speed multiplier for Audio Color Spectrum mode (mode 20)</p></div>
 </div>
 
 <div class="card">
@@ -176,7 +178,7 @@ input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:5px;width:1
 </div>
 
 <div class="grid-2">
-<div class="card">
+<div class="card mode-specific" data-modes="7">
 <h2>Range Control</h2>
 <div class="form-group">
 <div class="form-row-2">
@@ -187,13 +189,11 @@ input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:5px;width:1
 </div>
 </div>
 
-<div class="card">
+<div class="card mode-specific" data-modes="1,5">
 <h2>Advanced Options</h2>
-<div class="form-group"><div class="checkbox-group"><input type="checkbox" id="incgHueState" checked><label for="incgHueState">Enable gHue Increment</label></div><button onclick="sendCheckbox('incgHueState','Increment gHue')">Apply</button></div>
-<div class="form-group"><div class="checkbox-group"><input type="checkbox" id="audioBrightness"><label for="audioBrightness">Audio Brightness (Legacy)</label></div><button onclick="sendCheckbox('audioBrightness','Brightness Audio')">Apply</button></div>
-<p style="color:#666;font-size:0.85em;margin-top:-10px;margin-bottom:10px;">Note: Legacy audio brightness feature. Use Auto Brightness Settings above for amplitude-based brightness control.</p>
-<div class="form-group"><div class="checkbox-group"><input type="checkbox" id="coolLikeState" checked><label for="coolLikeState">Cool Like Incandescent</label></div><button onclick="sendCheckbox('coolLikeState','Cool Like')">Apply</button></div>
-<div class="form-group"><div class="checkbox-group"><input type="checkbox" id="autoBgState" checked><label for="autoBgState">Auto Background Color</label></div><button onclick="sendCheckbox('autoBgState','Auto Bg')">Apply</button></div>
+<div class="form-group mode-specific" data-modes="1"><div class="checkbox-group"><input type="checkbox" id="incgHueState" checked><label for="incgHueState">Enable gHue Increment</label></div><button onclick="sendCheckbox('incgHueState','Increment gHue')">Apply</button></div>
+<div class="form-group mode-specific" data-modes="5"><div class="checkbox-group"><input type="checkbox" id="coolLikeState" checked><label for="coolLikeState">Cool Like Incandescent</label></div><button onclick="sendCheckbox('coolLikeState','Cool Like')">Apply</button></div>
+<div class="form-group mode-specific" data-modes="5"><div class="checkbox-group"><input type="checkbox" id="autoBgState" checked><label for="autoBgState">Auto Background Color</label></div><button onclick="sendCheckbox('autoBgState','Auto Bg')">Apply</button></div>
 </div>
 </div>
 </div>
@@ -201,12 +201,11 @@ input[type="number"]{padding:8px;border:1px solid #ddd;border-radius:5px;width:1
 <script>
 var socket;
 var msgHandlers={
-'Mode':(v)=>document.getElementById('mode').value=v,
+'Mode':(v)=>{document.getElementById('mode').value=v;updateModeVisibility(v);},
 'Start Range':(v)=>document.getElementById('startRange').value=v,
 'End Range':(v)=>document.getElementById('endRange').value=v,
 'Palette':(v)=>document.getElementById('palette').value=v,
 'Increment gHue':(v)=>document.getElementById('incgHueState').checked=v==1,
-'Brightness Audio':(v)=>document.getElementById('audioBrightness').checked=v==1,
 'Color 1':(v)=>{document.getElementById('Color1').value=v;updateColorPreview(1,v);},
 'Color 2':(v)=>{document.getElementById('Color2').value=v;updateColorPreview(2,v);},
 'Color 3':(v)=>{document.getElementById('Color3').value=v;updateColorPreview(3,v);},
@@ -262,7 +261,36 @@ socket.onmessage=function(e){var m=JSON.parse(e.data);if(msgHandlers[m.type])msg
 }
 function unpackGroup(input){const r=input.split(',');let u=[];r.forEach(x=>{x=x.trim();if(x.includes('-')){const[s,e]=x.split('-').map(Number);for(let i=s;i<=e;i++)u.push(i);}else u.push(Number(x));});return u;}
 function sendGroup(n){const i=document.getElementById('group'+n+'Input').value;sendMessage('Group'+n,unpackGroup(i));}
-function sendMode(){sendMessage('Mode',document.getElementById('mode').value);}
+function updateModeVisibility(mode){
+  mode=parseInt(mode);
+  document.querySelectorAll('.mode-specific').forEach(function(el){
+    const modes=el.getAttribute('data-modes');
+    if(modes){
+      const modeList=modes.split(',').map(m=>parseInt(m.trim()));
+      if(modeList.includes(mode)){
+        el.classList.add('active');
+      }else{
+        el.classList.remove('active');
+      }
+    }
+  });
+  document.querySelectorAll('.color-picker-item[data-modes]').forEach(function(el){
+    const modes=el.getAttribute('data-modes');
+    if(modes){
+      const modeList=modes.split(',').map(m=>parseInt(m.trim()));
+      if(modeList.includes(mode)){
+        el.classList.add('active');
+      }else{
+        el.classList.remove('active');
+      }
+    }
+  });
+}
+function sendMode(){
+  const mode=document.getElementById('mode').value;
+  sendMessage('Mode',mode);
+  updateModeVisibility(mode);
+}
 function sendRange(){sendMessage('Start Range',document.getElementById('startRange').value);setTimeout(()=>sendMessage('End Range',document.getElementById('endRange').value),100);}
 function sendPalette(){sendMessage('Palette',document.getElementById('palette').value);}
 function sendCheckbox(id,type){
@@ -281,6 +309,7 @@ window.onload=function(){
 initWebSocket();
 for(let i=1;i<=4;i++)updateColorPreview(i,document.getElementById('Color'+i).value);
 ['fps','brightness','fadeAmount','fps_variability','twinkleSpeed','twinkleDensity','auroraSpeed','auroraIntensity','auroraWaveCount','auroraColorRange','ringSpeed','ringIntensity','treeHeight','treeTaperRatio','testRingNumber','bottomRingLEDs','middleRingLEDs','topRingLEDs','topZoneHeight','breathingRate','breathingVariability','breathHoldTime','audioMinAmplitude','audioMaxAmplitude','audioSmoothing','audioColorSpeed','audioWaveSpeed','autoBrightnessMinBrightness','autoBrightnessMaxBrightness','autoBrightnessMinAmplitude','autoBrightnessMaxAmplitude'].forEach(id=>updateRangeValue(id,document.getElementById(id).value));
+updateModeVisibility(document.getElementById('mode').value);
 };
 </script>
 </body>
